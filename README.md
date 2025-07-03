@@ -14,7 +14,7 @@ This portfolio is split into two main sections:
 
 ## 📄 CV
 
-And finally, here's a link to my CV, so that it's all in one place. [CV](./CV Maksymenkov BA.pdf)
+And finally, here's a link to my CV, so that it's all in one place. [CV](CV Maksymenkov BA.pdf)
 
 ---
 
