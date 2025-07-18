@@ -318,3 +318,177 @@ Curators define album templates (locations, characters, plot elements, etc.) wit
 <br>
 <br>
 
+## Assumptions & Constraints
+
+### Assumptions
+- **Access to Game Metadata**  
+  We’re counting on modern platforms (Steam, Epic Games, etc.) to expose achievement and save data via their APIs, and on popular retro emulators (RetroArch, Dolphin, PCSX2) to offer plugins or memory-reader hooks for extracting save snapshots and custom triggers.
+
+- **Emulator Integration**  
+  A set of popular emulators will be supported at launch, with community‑maintained plugins available for data parsing.
+
+- **Active Community Participation**  
+  Curators, list creators, and regular users within both English‑speaking and Ukrainian communities will actively contribute to content creation, moderation, and validation processes.
+
+- **User Technical Competence**  
+  Users know how to export saves from their retro emulators and capture/upload screenshots without hand-holding.
+
+- **Reliable AI Validation**  
+  Automated image-verification service should hit at least 90% accuracy in matching uploads to the templates defined by curators.
+
+- **Stable Internet Connectivity**  
+  End users have a dependable connection for uploading and downloading saves, achievements, and screenshots.
+
+### Constraints
+- **Team & Timeline**  
+  MVP development is limited to a four-person team (two developers, one business analyst, one QA engineer) over six months.
+
+- **Fixed Budget**  
+  Total MVP budget is capped at $45K, covering personnel, infrastructure, and essential tooling. Anything beyond the MVP features needs new funding.
+
+- **Emulator Support Scope**  
+  Only pre-selected list of emulators will be integrated in Phase I; support for others or proprietary tools comes later in Phase II.
+
+- **API Limitations**  
+  External APIs may throttle requests or require licensing—so manual data-entry must be available as a fallback.
+
+- **Browser Compatibility**  
+  Support the latest versions of Chrome, Firefox, and Edge. Legacy browsers and mobile-only interfaces are out of scope for the MVP.
+
+- **Storage & Retention**  
+  User storage quotas and a global cap keep us within budget. Saves not accessed for a year will be archived, while sticker-album images stay indefinitely (within quota limits).
+
+- **Regulatory Compliance**  
+  Must adhere to GDPR-style privacy rules and offer DMCA takedown processes for copyrighted content.
+
+- **Security & Performance**  
+  All data must be encrypted in transit and at rest. Public APIs will be rate-limited to 1,000 requests/hour per key, and the system must support at least 500 concurrent users without slowing down.  
+
+---
+<br>
+<br>
+
+## High-Level Business Requirements
+
+Below are the must-have capabilities (what the platform does) and quality attributes (how it performs) for Dream Project.
+
+### Functional Requirements
+
+**Save Management**  
+- Players can upload, download, and securely store game save files with full metadata (title, platform, version, playtime, chapter).  
+- Browse, filter, and sort saves by game, progress markers, popularity, or creator.  
+- Keep up to 25 versions per game, with options to archive, restore, or delete older saves.  
+- Community feedback is built in—anyone can like, dislike, or report a save, and flagged items display a warning banner until reviewed.
+
+**Achievement & Milestone Tracking**  
+- Automatically import and label official achievements via platform APIs.  
+- Create, edit, and collaboratively version multiple fan-made achievement lists per game.  
+- Comment on and rate lists; low-rated or flagged lists enter a moderation queue.  
+- Each achievement has its own page with criteria descriptions, media attachments, tags (e.g., “storyline,” “irreversible”), and completion stats (users and timestamps).
+
+**Sticker Album Collection**  
+- Curators design custom album templates (locations, characters, plot elements) with optional spoiler notices.  
+- Players drag-and-drop screenshots into template slots once they meet in-game criteria; an AI check verifies content consistency.  
+- Albums display completion percentages, award badges, and feature leaderboards showing avatars, nicknames, and timestamps.  
+- Spoiler images stay blurred until a user chooses to reveal them.
+
+**User Profiles & Progress Tracking**  
+- Profiles automatically showcase recent game activity, overall completion stats, counts of completed achievement sets and sticker albums, badges earned, and time-to-complete metrics.
+
+**Moderation & Reporting**  
+- Role-based access for Regular Users, List Creators, Curators, and Administrators.  
+- A centralized moderation queue handles all reported content, and content owners can appeal removal decisions within seven days.
+
+**API & Integration**  
+- Provide RESTful endpoints for save management, achievements, albums, and user profiles.  
+- Enforce a 1,000-requests/hour rate limit per API key, with manual data-entry fallbacks when external APIs hit their limits.
+
+### Non-Functional Requirements
+
+**Performance & Scalability**  
+- Support a minimum of 500 concurrent users without noticeable lag.  
+- Automatically scale storage and compute resources based on demand.
+
+**Security & Compliance**  
+- Encrypt all data in transit and at rest; comply with GDPR-like privacy standards and offer DMCA takedown workflows.  
+- Implement OAuth2 (or an equivalent) for authentication and authorization.
+
+**Availability & Reliability**  
+- Maintain at least 99.5% uptime, with fault-tolerant design and disaster recovery plans.
+
+**Localization & Accessibility**  
+- Offer full English and Ukrainian UI localization; meet WCAG 2.1 AA accessibility guidelines.
+
+**Maintainability**  
+- Modular architecture with clear separation of concerns; comprehensive logging and monitoring.
+
+---
+<br>
+<br>
+
+## Glossary
+
+- **Save File**  
+  A snapshot of your game right where you left off (level, chapter, playtime, and so on).
+
+- **Achievement**  
+  A milestone you unlock in-game. It can be an official trophy imported from the platform or a fan-made challenge dreamed up by the community.
+
+- **Fan-Made List**  
+  A custom collection of achievements created and maintained by players—perfect for adding extra challenges to your favorite games.
+
+- **Sticker Album**  
+  A themed digital scrapbook where you “stick” your best screenshots into slots defined by curators. Complete the album and earn badges!
+
+- **Curator**  
+  A user role responsible for designing album templates, organizing content, and enforcing quality standards.
+
+- **List Creator**  
+  The architect of fan challenges—this role builds and edits custom achievement lists for the community to tackle.
+
+- **Regular User**  
+  Anyone who plays, backs up saves, tracks achievements, and builds sticker albums—without the extra powers of a curator or list creator.
+
+- **Platform Administrator**  
+  The gatekeeper and moderator—this role has full control over system settings, user management, and content moderation.
+
+- **MVP (Minimum Viable Product)**  
+  The first fully working version of Dream Project, including the core features: save management, achievement tracking, and sticker albums.
+
+- **Metadata**  
+  The “data about data” for your saves and achievements—details like game title, platform, version, playtime, and chapter.
+
+- **AI Validation**  
+  An automated check that uses machine learning or image recognition to make sure your uploaded screenshots match the curator’s template.
+
+- **API (Application Programming Interface)**  
+  A set of RESTful endpoints that allow external applications and services to interact with Dream Project’s core modules.
+
+- **WCAG (Web Content Accessibility Guidelines)**  
+  The rulebook for making our platform accessible to everyone, including people with disabilities (we follow WCAG 2.1 AA standards).
+
+---
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+# Business Requirements Document (BRD)
+
+The Business Requirements Document (BRD) formalizes the detailed business needs, objectives, scope boundaries, and stakeholder expectations for Dream Project / Zanarkand Project. Consider it the single source of truth that keeps everyone—from developers to stakeholders—aligned on our goals and deliverables.
+
+## Document Structure <a name="document-structure"></a>
+Jump to any section below:
+
+- [Purpose & Scope](#purpose-and-scope)  
+- [Stakeholder Requirements](#stakeholder-requirements)  
+- [Business Needs & Objectives](#business-needs-and-objectives)  
+- [Detailed Business Requirements](#detailed-business-requirements)  
+- [Acceptance Criteria](#acceptance-criteria)  
+- [Constraints & Assumptions](#constraints-and-assumptions)  
+- [Approval & Sign-off](#approval-and-sign-off)  
+
+---
+
