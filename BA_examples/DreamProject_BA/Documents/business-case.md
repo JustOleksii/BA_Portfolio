@@ -442,34 +442,437 @@ This section highlights the main stakeholder groups for Dream Project, what role
 <br>
 <br>
 
-## Why It Matters (Value Proposition)
+## 7. Benefits & Value Proposition
 
-- **Regular Players** You never lose progress; enjoy a central dashboard for achievements; express creativity through sticker albums.  
-- **List Creators** Craft and share fan-made challenges; build reputation within the community.  
-- **Curators** Discover, organize, and spotlight the best albums; drive deeper engagement.  
-- **Admins** Manage content and security from a unified control panel.
+Dream Project exists to take progress that is currently scattered across save folders, platform dashboards, fan sites, and personal screenshots, and turn it into a structured, long-term record. The value is not just in “storing more data”, but in giving different stakeholders a coherent way to see, use, and build on that record.
 
-## Cost Estimate & Break-even Analysis
+### 7.1 Regular & Retro Players
 
-- **Team (6 months):**  
-  - 2 Developers (Ukraine/Poland) at \$2,000/mo each  
-  - 1 Business Analyst & 1 QA Engineer at \$1,500/mo each  
-- **Infrastructure:** \$3,000 total  
-- **Total Budget:** \$45,000 (Developers \$24k + BA/QE \$18k + Infra \$3k)
+For regular players and retro/emulator-focused players, Dream Project offers:
 
-**Break-even Plan:**  
-Platform access is free at launch. We’ll rely on community donations initially and introduce premium API offerings in Phase II. Break-even targets will be refined based on post-MVP user engagement metrics.
+- **A long-term, platform-agnostic archive of progress**  
+  Saves, achievements, and screenshot “stickers” are preserved independently of any single store account, device, or emulator configuration. Reinstalls, hardware changes, or closed platforms do not automatically erase years of progress.
 
-## Risks & Assumptions
+- **Deeper completion tracking than official systems provide**  
+  Players can see official achievement lists and fan-designed sets side by side for each game, with clear completion status and optional visual proof via stickers. This goes beyond “beat the game once” and supports more detailed, community-driven views of what “complete” really means.
 
-### Assumptions
-- Game metadata is accessible and accurate.   
-- Volunteers (especially from Ukraine) will engage as curators.  
-- Users are comfortable sharing screenshots and save data. 
+- **Structured use of screenshots instead of random image dumps**  
+  Screenshot albums are organised as templates per game, with defined slots and AI-assisted validation. Filling them feels like completing a digital Panini album rather than scrolling through a loose folder of images.
 
-### Risks & Mitigations
-- **Moderation Overload.** Start with manual reviews; plan automated flagging in Phase II.  
-- **Data Compatibility.** Build modular adapters for different save formats.  
-- **Legal/Copyright.** Draft clear Terms of Service and DMCA takedown processes.  
-- **Low Local Adoption.** Target outreach to Ukrainian gaming communities.  
-- **Security Threats.** Encrypt data at rest/in-transit; schedule frequent security audits.
+- **Discoverability of games that fit their taste and platforms**  
+  Simple recommendation flows help players pick a game for a chosen platform, based on their history and curated suggestions, instead of endlessly browsing stores or lists without context.
+
+### 7.2 Curators & Set/Album Creators
+
+For curators and community authors who design achievement sets and sticker albums, Dream Project provides:
+
+- **A stable home for fan-made structures**  
+  Achievement sets and album templates are treated as first-class artefacts with versioning, attribution, and clear visibility per game. Curators no longer have to rely only on scattered forum posts or spreadsheets.
+
+- **Tools tailored to how they think about games**  
+  Curators can define subsets, special branches (e.g. “low-level run subset”), and attach short hints or links to external guides. This allows them to express their understanding of a game in a structured, reusable form.
+
+- **Recognition and measurable impact**  
+  As players use and complete their sets and albums, curators can see how many people interacted with their content and how far they got. This feedback loop helps them refine their work and build a reputation inside the platform’s ecosystem.
+
+### 7.3 Global & Ukrainian Content Creators and Communities
+
+For content creators and community organisers (both global and Ukrainian-focused), Dream Project offers:
+
+- **Consistent profiles and stats for storytelling**  
+  Streamers, writers, and community leaders can reference user profiles, completion stats, and albums as part of their content. Progress is shown in a way that is easy to embed, explain, or screenshot for articles and videos.
+
+- **Support for language and cultural context**  
+  Global creators benefit from an English-first view of the platform, while Ukrainian creators get a space where Ukrainian language and games are visible, not secondary. The platform can also reflect policies around Russian-linked titles so that Ukrainian communities can make informed choices about what they support.
+
+- **Shared reference points for “how far is far”**  
+  Because achievements, fan sets, and sticker albums are structured, communities can quickly communicate what “100%” or “deep completion” looks like for a given game, without re-explaining it from scratch every time.
+
+### 7.4 Platform Admins & Product Team
+
+For the people operating and evolving Dream Project, the platform delivers:
+
+- **A clear, constrained MVP surface**  
+  Focusing on three pillars—saves, achievements, stickers—keeps the product scope understandable and manageable. Core flows can be monitored, improved, and scaled without being buried under unrelated social features.
+
+- **Observable usage and quality signals**  
+  Because saves, sets, and albums are structured, admins can see which games, features, and curator contributions actually drive engagement. This supports data-informed decisions about future roadmap and investment.
+
+- **Moderation with context**  
+  Reported saves, screenshots, or achievement sets can be reviewed within their game and album context, rather than as isolated files. This makes it easier to enforce basic rules (e.g. content safety) without over-complicating the system.
+
+### 7.5 External Services & Integration Partners
+
+For external services (such as emulator platforms or existing achievement APIs) that Dream Project integrates with:
+
+- **An additional, non-intrusive way to surface their value**  
+  When allowed by their terms, public data such as achievement structures or progress snapshots can be reflected inside Dream Project, giving their ecosystems more visibility without replacing their core functionality.
+
+- **Controlled, transparent use of integrations**  
+  Dream Project is designed around read-only, API-based interactions where possible, not invasive tooling. This reduces support risk and keeps the relationship aligned with existing rules and expectations.
+
+---
+
+Across all these groups, the central value proposition is the same:  
+**Dream Project turns fragmented, per-platform traces of play into a structured, long-term record that players and communities can actually use, revisit, and build upon.**
+
+---
+<br>
+<br>
+
+## 8. Assumptions & Constraints
+
+This section makes explicit the key assumptions and constraints under which the Dream Project MVP is defined. They explain *what we are quietly counting on to be true* and *which boundaries we accept* when designing and delivering the first version. Detailed, trackable entries will be maintained in the separate Risk & Assumptions Register.
+
+---
+<br>
+
+### 8.1 Key Assumptions
+
+The initial scope and design of Dream Project rely on the following assumptions:
+
+- **Game metadata is reasonably accessible and maintainable**  
+  Core information about games and platform variants (titles, platforms, release info, basic identifiers) can be obtained from public sources or community-maintained databases and kept up to date with a manageable effort.
+
+- **Users are willing to share saves and screenshots in a controlled way**  
+  A meaningful portion of players are comfortable uploading save files and screenshots to a third-party platform, provided that privacy controls, basic moderation, and clear terms of use are in place.
+
+- **Some users will agree to link external gaming profiles**  
+  At least a segment of users is ready to connect their profiles from existing platforms or services to a relatively new, independent platform if the value is clear and the data access is transparently limited to read-only synchronisation.
+
+- **Curators will emerge from the community**  
+  A group of motivated users (including a visible Ukrainian segment) will be interested in designing and maintaining fan achievement sets and sticker album templates without direct financial incentives in the first phase.
+
+- **Read-only integrations are possible with at least some external services**  
+  For certain ecosystems (especially retro achievement services and some PC platforms), it is technically and legally possible to read public progress data via APIs or similar mechanisms, without violating terms of service.
+
+- **AI-based screenshot validation is “good enough” at a basic level**  
+  An AI-based check can be implemented that is sufficiently accurate to flag obviously wrong screenshots (wrong game, wrong scene) while tolerating natural variation. It does not need to be perfect, just useful.
+
+- **Manual or semi-manual achievement tracking is acceptable for some users**  
+  In cases where full automation is impossible (e.g. certain console platforms), part of the user base still finds value in manually confirming completion or attaching screenshots as proof, especially for fan-made sets.
+
+- **Language and regional policies can be enforced at catalogue level**  
+  It is feasible to tag and filter game entries according to regional and ethical policies (e.g. excluding or specially marking titles associated with Russian companies), and to apply these rules via metadata rather than deep technical changes.
+
+- **Early user acquisition is possible through community channels**  
+  Even without large marketing budgets, initial adoption targets can be reached by focusing on clearly defined communities (retro players, achievement hunters, Ukrainian gaming communities) and collaborating with creators and curators.
+ ---
+<br> 
+
+### 8.2 Key Constraints
+
+The MVP is also shaped by several constraints that limit what can be done in the first phase:
+
+- **Technical integration constraints (especially consoles)**  
+  Dream Project will rely on documented APIs, emulator support, and publicly exposed services. For closed console ecosystems (PlayStation, Xbox, Nintendo), full official integration may or may not be achievable in the future; for the MVP we assume only limited or no direct integration and plan around that uncertainty.
+
+- **Platform and ecosystem constraints**  
+  The project cannot unilaterally change how external platforms expose data or what they permit via their terms of service. Where no suitable integration path exists, the platform must fall back to manual input, screenshots, or indirect signals instead of real-time, official data feeds.
+
+- **Legal and copyright constraints**  
+  The platform cannot distribute game ROMs, BIOS files, or other copyrighted game assets. Screenshots remain user-generated content; external metadata and assets must be used in compliance with licensing terms and with clear attribution where required.
+
+- **Privacy and security obligations**  
+  User accounts, saves, and screenshots must be stored and processed in line with applicable privacy regulations and basic security practices (encryption, access controls, audit logs). This constrains how features can be implemented, logged, and tested.
+
+- **Resource and timeline constraints**  
+  The MVP is scoped for a relatively small team and a limited timeframe (approximately four months to achieve initial objectives). This constrains the number of supported platforms, depth of integrations, and amount of “nice-to-have” features that can be included.
+
+- **Catalogue policy constraints (Ukraine-specific context)**  
+  The platform must support clear policies regarding Russian-linked content:  
+  - no Russian language localisation is provided by default in the UI;  
+  - games developed or published by Russian companies may be excluded or explicitly flagged so users understand the implications of supporting them;  
+  - Ukrainian-language content and communities should remain visible and prioritised where relevant.  
+  These policies influence how the catalogue is curated and how games are presented to different user segments.
+
+- **Marketing and outreach limitations**  
+  There is no assumption of large paid marketing campaigns. Growth in the MVP phase depends mainly on targeted outreach to niche communities, collaboration with curators and content creators, and word of mouth.
+
+- **Non-goals for the MVP**  
+  The MVP does **not** aim to:  
+  - implement strict anti-cheat enforcement or tamper-proof verification for every save, achievement, or sticker;  
+  - replace existing game stores or achievement services (e.g. Steam, RetroAchievements) as the primary place where players purchase games or receive official recognition.  
+
+Together, these assumptions and constraints frame what can realistically be delivered in the first release and help explain why certain design choices are made, especially where trade-offs between automation, legality, feasibility, and user adoption are involved.
+
+---
+<br>
+<br>
+
+## 9. Risks Summary
+
+This section provides a high-level overview of the main risk areas for the Dream Project MVP.  
+It is meant for readers who need to understand *where things can go wrong* without diving into every detail.  
+Each risk listed here is expanded with an ID, owner, likelihood, impact, mitigation actions, and status in the separate **Risk & Assumptions Register** document.
+
+---
+<br>
+
+### 9.1 Key Risk Areas (MVP)
+
+| Risk Area                        | Description                                                                                           | Potential Impact                                                                                          | Mitigation Direction                                                                                       |
+|----------------------------------|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| Low User Adoption                | Players may be reluctant to try a new platform, link external profiles, or upload saves/screenshots. | MVP goals for active users and engagement are not met; weak feedback loop for future improvements.       | Focus on clear value messages, simple onboarding, targeted outreach to niche communities, early UX polish. |
+| Lack of Curators & Contributors | Not enough motivated users volunteer to create/maintain fan achievement sets and sticker albums.     | Catalogue remains thin; core features (fan sets, albums) look empty or underused.                         | Identify potential curators early, highlight their work in the UI, run small campaigns with key communities.|
+| Integration Limitations          | Technical or legal constraints block planned read-only integrations with external services/APIs.     | Official progress cannot be synced as expected; more work relies on manual updates and screenshots.      | Treat integrations as optional enhancements, design flows that still work manually, prioritize safe APIs.  |
+| Moderation & Content Quality     | Shared saves, screenshots, or fan sets might include inappropriate, low-quality, or misleading content. | Decreased trust in the platform, possible user complaints, higher support load.                           | Basic reporting tools at MVP, simple review queues, conservative defaults, gradually introduce automation. |
+| AI Validation Inaccuracy         | Screenshot validation may be too strict (blocking valid uploads) or too weak (accepting wrong ones). | Frustrated users, meaningless stickers, or both; lower perceived reliability of albums.                   | Start with tolerant thresholds, allow manual override/appeal, monitor patterns and adjust models over time.|
+| Legal / Policy Misalignment      | Use of metadata, integrations, or catalogue policies (e.g. handling Russian-linked content) may cause legal or reputational issues. | Need to remove data or change behaviour quickly; community backlash if expectations are not managed.      | Clear Terms of Use, conservative approach to third-party data, explicit policies for catalogue curation.   |
+| Security & Privacy Incidents     | Vulnerabilities lead to unauthorised access to accounts, saves, or screenshots.                      | Loss of user trust, potential regulatory implications, damage to platform reputation.                     | Encrypt data in transit/at rest, apply basic security best practices, regular reviews of auth and storage. |
+| Scope Creep vs. Limited Resources| Pressure to add social, competitive, or platform-specific features beyond MVP scope.                 | Delays, unstable product, failure to deliver core value within planned timeframe.                         | Maintain a strict MVP feature list, use Business Case goals as reference, defer non-essential ideas to backlog.|
+
+This summary is not exhaustive, but it highlights the main areas that can significantly affect whether the MVP achieves its business objectives.  
+Operational teams should use the **Risk & Assumptions Register** to monitor these risks over time and update likelihood, impact, and actions as the project evolves.
+
+---
+<br>
+<br>
+
+## 10. High-Level Timeline & Dependencies
+
+This section shows how the Dream Project MVP can be delivered within roughly **four months**, and which dependencies may affect that schedule.  
+It is intentionally high-level: the detailed tasks, dates, and ownership will live in the separate **Project Plan** document.
+
+---
+<br>
+
+### 10.1 Timeline Overview
+
+The MVP is split into four main phases. Some activities overlap, especially around community work and catalogue setup.
+
+| Phase | Approx. Timing     | Focus                                                                 | Key Outcomes                                                                                          |
+|------:|--------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| 1     | Weeks 1–3          | Discovery, UX concepts, technical foundations                        | Refined scope, initial UX flows and wireframes, tech stack decisions, basic data model and API design|
+| 2     | Weeks 3–8          | Core MVP build (saves, achievements, sticker albums, profiles)       | Working backend and web UI for main flows, basic catalogue, user accounts, curator roles             |
+| 3     | Weeks 6–12         | Integrations, AI validation, curator tooling, seed content           | First read-only integrations (where feasible), screenshot validation v1, initial fan sets and albums |
+| 4     | Weeks 10–16        | Closed beta, tuning, onboarding, initial public MVP launch           | Early user feedback, polished core flows, simple onboarding, monitored public release                |
+
+**Phase 1 – Discovery & Foundations (Weeks 1–3)**  
+- Finalise MVP scope using the Business Case and SRS as reference.  
+- Design key user journeys (finding a game, using saves, tracking achievements, filling stickers).  
+- Produce low-fidelity wireframes for the main screens.  
+- Define core data structures (games, platform variants, saves, achievements, stickers, profiles).  
+- Decide on initial target platforms (e.g. a limited set of retro systems and PC).  
+
+**Phase 2 – Core MVP Implementation (Weeks 3–8)**  
+- Implement user registration, authentication, and basic roles (user, curator, admin).  
+- Build the game catalogue UI and simple search/browse for games and platform variants.  
+- Implement save management (upload, storage, metadata, basic search).  
+- Implement achievement tracking structures (official sets, fan sets) without deep integrations yet.  
+- Implement sticker album templates and basic album-filling flow.  
+- Create initial profile and progress views with simple statistics.
+
+**Phase 3 – Integrations, AI, and Seed Content (Weeks 6–12)**  
+- Integrate with at least one external service (e.g. retro achievement API or similar) where terms allow it.  
+- Implement first version of AI-based screenshot validation and integrate it into the sticker upload flow.  
+- Develop curator-facing tools for creating and editing achievement sets and album templates.  
+- Start catalogue curation and policy application (including handling of Russian-linked titles).  
+- Onboard a small number of early curators and work with them to create seed sets and albums for selected games.
+
+**Phase 4 – Beta, Tuning, and Launch (Weeks 10–16)**  
+- Run a closed beta with a small group of players and curators (EN and UA) to test flows end-to-end.  
+- Collect feedback on usability, performance, AI validation behaviour, and clarity of value.  
+- Refine onboarding, recommendations, and key UI messages based on beta insights.  
+- Stabilise the platform, fix critical issues, tighten moderation/reporting flows.  
+- Open the MVP to a wider audience, starting with targeted communities, and monitor usage against the success criteria.
+
+---
+<br>
+
+
+### 10.2 Key Dependencies
+
+Several dependencies can affect the pace and success of the timeline above. They are managed in more detail in the **Project Plan** and **Risk & Assumptions Register** but summarised here.
+
+- **External APIs and Services**  
+  - Availability and stability of APIs from retro services or other platforms used for read-only progress sync.  
+  - Clarity of their terms of service and any limits on usage (rate limits, data access rules).
+
+- **Community & Curator Engagement**  
+  - Willingness of early curators to participate in defining achievement sets and albums.  
+  - Response from targeted communities (retro forums, achievement hunters, Ukrainian gaming communities) to outreach efforts.  
+
+- **AI Model and Infrastructure**  
+  - Access to an AI model suitable for screenshot validation within acceptable cost and latency.  
+  - Ability to tune thresholds based on real user behaviour without disrupting the core experience.
+
+- **Catalogue Data Sources**  
+  - Quality and coverage of initial game metadata sources (public databases, community-maintained lists).  
+  - Effort required to tag and filter games according to regional and ethical policies (especially Ukraine-related catalogue rules).
+
+- **Internal Capacity and Skills**  
+  - Availability of development, UX, and operations capacity to cover backend, frontend, and infrastructure work in parallel.  
+  - Ability of the small team to keep scope under control and avoid expanding into non-MVP features.
+
+If any of these dependencies are delayed or change significantly (for example, an API becomes unavailable or curator engagement is lower than expected), the roadmap and scope may need to be adjusted. The Business Case provides the high-level direction; day-to-day trade-offs will be handled through the Project Plan and risk management process.
+
+---
+<br>
+<br>
+
+## 11. Financial & Effort Overview
+
+This section provides a high-level view of the effort and cost profile for delivering the Dream Project MVP.  
+The figures are approximate and are meant to show **scale and feasibility**, not a final contractual budget.
+
+---
+<br>
+
+### 11.1 Effort Profile (Team & Roles)
+
+The MVP described in this Business Case is sized for a **small cross-functional team** working over roughly **four months**.  
+At a high level, the effort corresponds to about **12 person-months** across the following roles:
+
+| Role / Function           | Approx. Effort (Person-Months) | Notes                                                                                 |
+|---------------------------|---------------------------------|---------------------------------------------------------------------------------------|
+| Product / Business Analysis | 1.5                           | Scope refinement, prioritisation, requirements, backlog grooming                      |
+| UX / UI Design           | 1.5                             | Core flows, wireframes, interaction patterns, basic visual system                    |
+| Backend Engineering      | 3.0                             | Core APIs, data model, integrations, security, storage                               |
+| Frontend Engineering     | 3.0                             | Web UI, catalogue, profiles, save/achievement/album flows                            |
+| AI / ML Engineering      | 1.0                             | Screenshot validation setup, model integration, basic tuning                         |
+| QA / Testing             | 1.0                             | Test design, regression tests, basic automation for critical paths                   |
+| DevOps / Infrastructure  | 1.0                             | Environments, CI/CD, monitoring, logging, basic scaling                               | 
+
+Some of these functions can be combined (e.g. engineers sharing DevOps responsibilities, BA sharing basic product ownership), but this breakdown shows the **order of magnitude** required to reach a public MVP with the scope defined earlier.
+
+---
+<br>
+
+### 11.2 Cost Drivers
+
+Instead of a line-by-line financial plan, it is more useful at this stage to highlight the **main cost drivers**:
+
+- **Team Time**  
+  The primary cost is the time of the core team (engineers, UX, BA/product, QA). Scope changes, additional platforms, or extra integrations will mostly impact this part.
+
+- **Infrastructure & Hosting**  
+  Servers, storage, and bandwidth for:
+  - user accounts and profiles,  
+  - save files (potentially large uploads),  
+  - screenshots for sticker albums,  
+  - basic monitoring, logging, and backups.
+
+- **AI Screenshot Validation**  
+  Running an AI model for screenshot checks—either self-hosted or via a third-party API—introduces variable costs linked to the number of uploads.
+
+- **Third-Party Tools & Services**  
+  Developer tooling (CI/CD, error tracking, monitoring), domain registration, and possibly game metadata sources or specialised APIs.
+
+- **Community, Support & Moderation**  
+  Time spent responding to early users, onboarding curators, and reviewing reported content.
+
+  ---
+<br>
+
+### 11.3 Indicative Budget Range
+
+To give a concrete sense of scale, we can assume:
+
+- a small team of mostly **junior specialists based in Ukraine**, with relatively modest monthly rates compared to Western European or US markets;
+- infrastructure sized for a **low-to-moderate** early user base over the first months.
+
+Under these assumptions:
+
+- **Aggregated team cost for the MVP** (≈12 person-months at junior/low-mid rates) is on the order of **$11,000–$12,000 USD**.  
+- **Infrastructure, AI, and tooling** for the build period plus the first months of live operation can reasonably be kept in the **$1,500–$2,000 USD** range.
+
+This yields a total indicative MVP budget of roughly:
+
+> **≈ $13,000–$15,000 USD**
+
+This places Dream Project in the category of a **small, focused pilot investment**:  
+large enough to require clear objectives and success criteria, but still realistic for a small team or early-stage investor to fund as an experiment.
+
+---
+<br>
+
+### 11.4 Financial & Effort Risks / Levers
+
+From a financial and effort perspective, the main levers that can move the cost up or down are:
+
+- **Scope Discipline**  
+  Keeping the MVP focused on the three pillars (saves, achievements, sticker albums) and avoiding large social, mobile, or competitive features helps maintain the budget within the indicative range.
+
+- **Platform & Integration Choices**  
+  Starting with a limited set of platforms and 1–2 carefully chosen external integrations reduces complexity and uncertainty.
+
+- **Reuse of Existing Services**  
+  Reusing existing infrastructure components, off-the-shelf tools, and third-party AI services can significantly shorten development time.
+
+- **Community-Driven Content**  
+  Relying on curators and communities to create fan achievement sets and sticker albums means that the breadth of content scales with engagement, not purely with internal budget.
+
+Taken together, this overview shows that the Dream Project MVP is **ambitious but bounded**: it requires a clear, non-trivial investment, yet remains within a realistic budget for a small, well-focused team working on a portfolio-ready or early-stage product.
+
+---
+<br>
+<br>
+
+## 12. Approval & Next Steps
+
+This section explains how the Business Case should be reviewed and approved, and what happens once approval is granted.  
+The goal is to make it clear who is expected to say “yes, we proceed with this MVP” and which concrete steps follow that decision.
+
+---
+<br>
+
+### 12.1 Approval
+
+For Dream Project, approval is primarily about confirming three things:
+
+1. **The problem is worth solving** – the fragmentation of saves, achievements, and screenshot-based memories is accepted as a real problem for the target audience.
+2. **The proposed solution and scope are realistic for an MVP** – the three pillars (saves, achievements, sticker albums), the constraints, and the four-month timeline are considered achievable.
+3. **The initial investment level is acceptable** – the indicative effort and budget (small cross-functional team, ≈$13–15k USD level) are within a tolerable range for a pilot.
+
+In a real organisation, the following roles would review and sign off this Business Case:
+
+- **Initiator / Business Analyst (Document Author)** – confirms that the analysis is coherent and aligned with the intended scope.  
+- **Product Owner / Sponsor** – confirms that the proposed MVP matches the product vision, priorities, catalogue policies, and risk appetite.  
+- **Technical Lead / Architect** – confirms that the solution outline and constraints are technically feasible in the given timeframe.
+
+For a portfolio project, these roles can be represented explicitly in the document as placeholders (e.g. “Product Sponsor”, “Technical Reviewer”) with signature / approval fields, demonstrating that the process has been thought through even if there is no real-world sponsor yet.
+
+---
+<br>
+
+### 12.2 Next Steps After Approval
+
+Once this Business Case is approved, the following next steps should be initiated:
+
+1. **Create and refine detailed analysis artefacts**  
+   - Elaborate the **Business Analysis Document** (business context, AS-IS/TO-BE processes, business rules, gap analysis).  
+   - Finalise the **Stakeholder & Communication Plan** (who is engaged, how, and when).  
+   - Develop the **Business Requirements Document (BRD)** to link high-level business objectives to concrete capabilities.
+
+2. **Define solution requirements and models**  
+   - Produce the **System Requirements Specification (SRS)** with detailed functional and non-functional requirements, data mapping, and user stories with acceptance criteria.  
+   - Document **Use Case Specifications** and supporting **visual models** (process diagrams, context diagram, data model, wireframes).
+
+3. **Set up risk and planning artefacts**  
+   - Expand the risks outlined in Section 9 into the **Risk & Assumptions Register** with IDs, owners, likelihood/impact, and mitigation actions.  
+   - Create the **Project Plan** with concrete milestones, sprints/phases, and responsibilities, using the high-level timeline from Section 10 as a starting point.
+
+4. **Prepare for implementation and early community engagement**  
+   - Confirm the initial set of supported platforms and games for the MVP catalogue.  
+   - Identify potential early curators and communities for closed beta participation.  
+   - Align technical and infrastructure decisions with the constraints and budget envelope defined in Sections 8 and 11.
+
+   ---
+<br>
+
+### 12.3 Review & Update Cadence
+
+The Business Case should not be treated as frozen forever. During the MVP lifecycle:
+
+- A **light review** is recommended at the end of each major phase (as outlined in Section 10) to verify that:
+  - the original problem and objectives are still valid,
+  - major assumptions have not fundamentally changed,
+  - any significant scope shifts are consciously decided and documented.
+
+- If substantial changes occur (for example, a new integration opportunity, a major shift in catalogue policy, or a different budget level), this document should be updated and re-confirmed by the same roles that approved it.
+
+In this way, the Business Case remains a living reference point: it records why Dream Project is being built, what success is expected to look like, and how the team agreed to approach the first, MVP-level investment.
+
+---
+<br>
