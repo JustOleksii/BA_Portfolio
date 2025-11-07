@@ -26,10 +26,10 @@ The links below lead to overview files that describe the structure and contents 
 
 - **Documentation Deliverables (Documents)**  
   This package contains the core text-based BA artefacts for Dream Project: Business Case, Business Analysis Document (with gap analysis, business context, and business rules), Stakeholder & Communication Plan, Business Requirements Document (BRD), System Requirements Specification (SRS), Use Case Specifications, Risk & Assumptions Register, Project Plan, Test Case Specification, and the Requirements Traceability Matrix (RTM).  
-  An overview of these materials and how they are organised can be found in [Documentation.md](./Documentation.md#documentation-deliverables).
+  An overview of these materials and how they are organised can be found in [Documentation.md](./Documents/Documentation.md).
 
 - **Diagram Deliverables (Visuals)**  
-  Browse the visual side of the project that complement the documentation: Context Diagram & High-Level System Overview, Business Process Diagrams (AS-IS / TO-BE), Use Case Diagram, Data Model Diagram (ERD), Integration/Data Flow Diagrams, Sequence Diagrams for key scenarios, Wireframes / Low-Fidelity UI Mockups, and user journey maps. Find their description in [Diagrams.md](./Diagrams.md#diagram-deliverables).
+  Browse the visual side of the project that complement the documentation: Context Diagram & High-Level System Overview, Business Process Diagrams (AS-IS / TO-BE), Use Case Diagram, Data Model Diagram (ERD), Integration/Data Flow Diagrams, Sequence Diagrams for key scenarios, Wireframes / Low-Fidelity UI Mockups, and user journey maps. Find their description in [Diagrams.md](./Visuals/Diagrams.md).
 
 ---
 
