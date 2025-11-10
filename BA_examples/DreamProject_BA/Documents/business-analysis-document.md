@@ -46,9 +46,6 @@ Use the links to jump directly to the part you’re interested in.
 - **[13. Glossary & Definitions](#13-glossary--definitions)**  
   Defines key terms used across Dream Project documentation (e.g. “Sticker Album Template”, “Curator”, “Fan Achievement Set”, “Platform Variant”), ensuring that all readers share a common vocabulary.
 
-- **[14. References & Related Documents](#14-references--related-documents)**  
-  Lists related artefacts such as the Business Case, BRD, SRS, Stakeholder & Communication Plan, Risk & Assumptions Register, and links this document to the rest of the BA package.
- 
 ---
 <br>
 <br>
@@ -973,216 +970,1872 @@ These gaps feed directly into the next sections of the document:
 <br>
 <br>
 
-## Business Rules
+## 7. Business Processes
 
-### User Accounts & Roles
-- **Role-Based Access**  
-  - **Regular Users** can browse and search save files, achievement lists, and sticker albums—and like, dislike, or report any content.  
-  - **List Creators** design, edit, and publish fan-made achievement lists.  
-  - **Curators** define album templates, organize featured collections, and add descriptions or spoiler warnings.  
-  - **Platform Administrators** have full moderation controls and system-management interfaces.  
-- **Progress Tracking**  
-  Each user profile automatically shows recent game activity, playthrough progress (level, chapter, playtime), counts of completed achievement sets and sticker albums, plus any earned badges, and overall completion percentages.
+This section describes the key business processes around saves, achievements, screenshots, and curation.  
+It is not a technical workflow specification, but a **domain-level view** of how players and curators act today (AS-IS) and how they are expected to act with Dream Project (TO-BE).
 
-### Save Management Rules
-- **Unique File Metadata**  
-  Every save file entry includes game title, platform, version, playtime, and chapter/level.  
-- **Version Control**  
-  Users can keep up to 25 versions per game; older versions are archived but can be restored or deleted at will.  
-- **Reporting & Moderation**  
-  Any user may report save files for corruption, malware, or mismatches. Reported items display a warning banner until an admin reviews them.
+The processes covered here are:
 
-### Achievement Tracking Rules
-- **Official vs. Fan-Made**  
-  Official achievements are auto-imported and clearly labeled. Fan-made lists can be created, versioned, and collaboratively edited.  
-- **Collaborative Lists**  
-  Multiple active fan-made challenge lists per game are allowed, including themed subsets (e.g., difficulty modes). Creators can collaboratively add, remove, or edit achievements. 
-- **Commenting & Rating**  
-  Users can start threaded discussions on individual achievements and rate full lists. Flagged or low-rated items enter the moderation queue.  
-- **Dedicated Achievement Pages**  
- Each achievement has a dedicated page with criteria description, media attachments, comment threads, and optional flags (e.g., storyline achievement, irreversible unlocks, final completion indicator).
- - **Completion Statistics**: Display percentage of users who have completed each achievement and lists of users (with nicknames, avatars, and timestamps) who achieved completion. Show real time taken to unlock achievement sets.
+1. Choosing a game and deciding “what to do next”.
+2. Preserving and sharing saves.
+3. Tracking achievements and challenges.
+4. Capturing and using screenshots as memories.
+5. Creating and maintaining community structures (fan sets, albums).
 
-### Sticker Album Rules
-- **Custom Templates**  
-Curators define album templates (locations, characters, plot elements, etc.) with descriptions and optional spoiler warnings. Multiple themes per game are supported. 
-- **Upload & Validation**  
-  Screenshots are dragged into album slots; an AI-driven system verifies consistency and filters out inappropriate content.  
-- **Spoiler Protection**  
-  Images flagged as spoilers are auto-blurred until a user opts to reveal them.  
-- **Completion Badges**  
-  Completing an album grants a game-specific badge on the user’s profile. 
- - **Completion Statistics**: Display percentage of users who have completed each sticker album and list of users (nicknames, avatars, timestamps) who completed it, along with real time taken. 
-- **Content Ownership**  
-  Users retain full rights to their uploads; only the uploader or admins can remove screenshots.
+---
+<br>
 
-### Moderation & Reporting
-- **Reporting Workflow**  
-  Items reported by users (saves, achievements, screenshots) are flagged and remain visible with cautionary graphics until reviewed.  
-- **Administrative Review**  
-  Admins prioritize content in a moderation queue based on report severity and volume.  
-- **Appeals Process**  
-  Content owners may appeal removal decisions within seven days.
+### 7.1 AS-IS Process Summaries
 
-### Data Retention & Privacy
-- **Save Retention**  
-  Saves not accessed for one year are archived, with advance notification to the user before deletion.  
-- **Screenshot Retention**  
-  Screenshots in sticker albums are stored indefinitely.  
-- **Privacy Compliance**  
-  All personal data is encrypted in transit and at rest, following GDPR-like standards.  
-- **API Rate Limits**  
-  Public API access is capped at 1,000 requests per hour per registered key to ensure system stability.  
+#### 7.1.1 Choosing a Game / Deciding What to Play
+
+1. Player opens a storefront, launcher, or physical collection.
+2. Scrolls through an often long list of owned or installed games.
+3. Makes a choice based on:
+   - mood,
+   - what friends are playing,
+   - current marketing or sales,
+   - or random impulse.
+4. If they want “something fitting my current mood / platform”, they:
+   - search online for recommendation lists,
+   - watch YouTube or read articles,
+   - manually cross-check availability on their platform.
+5. Any decision about “I want a game I can play in this specific way (route, challenge, completion style)” is handled mentally or through scattered notes.
+
+---
+<br>
+
+#### 7.1.2 Preserving and Sharing Saves
+
+1. Progress is saved automatically by the game/platform (cloud) or manually (local saves/save states).
+2. For personal backup:
+   - either the platform’s cloud handles it,
+   - or the player manually copies save folders or uses a backup tool.
+3. To share a save with someone:
+   - the player locates the save folder or memory card image,
+   - compresses it,
+   - uploads it somewhere (file host, forum),
+   - sends instructions on where and how to place it.
+4. The recipient:
+   - downloads the file,
+   - follows the manual instructions,
+   - hopes it matches their game version/platform and works correctly.
+5. There is no central place to browse saves for a particular situation; discovery is done via search engines, forum threads, or word of mouth.
+
+---
+<br>
+
+#### 7.1.3 Tracking Achievements and Challenges
+
+1. The player unlocks **official achievements/trophies** by playing on modern platforms.
+2. To see their status:
+   - they open platform-specific overlays or profiles,
+   - sometimes use third-party sites to aggregate across platforms.
+3. If they want more than official lists:
+   - they search for fan-made challenge lists, checklists, or “true 100%” guides.
+4. Tracking completion of fan lists is usually done by:
+   - marking entries in a personal spreadsheet or printed checklist,
+   - updating a wiki account or forum signature manually,
+   - or simply remembering what was done.
+5. There is no unified view of “my official + fan-made progress” per game.
+
+---
+<br>
+
+#### 7.1.4 Capturing & Using Screenshots
+
+1. During play, the player occasionally takes screenshots via platform shortcuts or emulator hotkeys.
+2. Screenshots are stored:
+   - in local directories,
+   - in a console gallery,
+   - or in the launcher’s screenshot system.
+3. When they want to share a moment:
+   - they post the screenshot on social media, forums, or messaging apps,
+   - add ad hoc text to explain context.
+4. Over time, screenshots accumulate and:
+   - become difficult to search or re-contextualise,
+   - are rarely tied to specific achievements, bosses, or story beats in any structured way.
+5. If players want a “collection” (e.g. one shot per boss), they manually organise folders or create their own collages.
+
+---
+<br>
+
+#### 7.1.5 Creating & Maintaining Community Structures
+
+1. A passionate player decides to create:
+   - a fan achievement list,
+   - a list of challenges,
+   - or a thematic screenshot idea for a game.
+2. They publish it via:
+   - forum post,
+   - Google Sheet or document,
+   - wiki page,
+   - Discord channel.
+3. Other players:
+   - discover it through links or recommendations,
+   - possibly copy or adapt it in their own files.
+4. Progress is tracked individually, not centrally:
+   - each player manages their own version of the list,
+   - creators do not have a clear view of how many people used or completed it.
+5. Updating or versioning the list:
+   - requires editing the original post/document,
+   - may lead to multiple inconsistent copies existing simultaneously.
+
+---
+<br>
+
+### 7.2 TO-BE Process Summaries
+
+#### 7.2.1 Choosing a Game / Deciding What to Play (with Dream Project)
+
+1. The user signs in to Dream Project and selects a **target platform** (e.g. PC, PS1, SNES).
+2. They can:
+   - search directly for a known game, *or*
+   - ask for a **recommendation**.
+3. Dream Project recommends a game+platform variant based on:
+   - the user’s previous activity (saved games, completed sets, filled albums),
+   - general popularity and curated suggestions,
+   - possibly special criteria (anniversary of release, notable events).
+4. The user can:
+   - accept the suggestion,
+   - or reject it and ask for another until something fits.
+5. When a game is selected, its **game page** presents:
+   - available saves,
+   - official + fan achievement structures,
+   - sticker albums.
+6. The user decides what to do *for this game* right now (use a save, follow a set, fill an album) from a single, focused entry point.
+
+---
+<br>
+
+#### 7.2.2 Preserving and Sharing Saves (with Dream Project)
+
+1. A user finishes or reaches an interesting point in a game and wants others to use that state.
+2. They open the game page in Dream Project, go to the **Saves** section, and click “Upload Save”.
+3. They provide:
+   - the save file,
+   - target platform variant (e.g. PC, PS1),
+   - a short description (“before final route choice”, “post-boss, level 60 mage build”),
+   - optional tags (difficulty, route, build notes).
+4. Dream Project:
+   - stores the save,
+   - associates it with the game and platform,
+   - indexes metadata for search.
+5. Another user:
+   - visits the same game page,
+   - filters saves by situation (e.g. “before final choice”) or tags (difficulty, build),
+   - picks a save that fits their intention.
+6. They download and follow platform-specific instructions (where needed), provided in a standardised, non-technical way.
+7. Feedback (e.g. “useful/not useful”, report) helps the system and admins understand which saves are reliable and which require moderation.
+
+---
+<br>
+
+#### 7.2.3 Tracking Achievements and Challenges (with Dream Project)
+
+1. On the game page, the user switches to the **Achievements** section.
+2. They see:
+   - the **official achievement list** (if applicable),
+   - one or more **fan-made sets** curated by the community.
+3. If they choose to link external profiles (where allowed):
+   - Dream Project reads their official achievement status,
+   - marks already completed items automatically.
+4. The user selects a fan-made set (or subset) they want to follow (e.g. “true 100% route”, “low-level completion subset”).
+5. During play:
+   - completion may be updated automatically via integrations (for retro/emulator scenarios),
+   - or manually by the user, optionally adding:
+     - screenshots,
+     - references to saves that reflect the completed condition.
+6. The set overview in Dream Project shows:
+   - what is completed,
+   - what remains,
+   - optional completion time (from first recorded progress to final item).
+7. Curators see aggregated, anonymised stats about how many players are using and completing their sets.
+
+---
+<br>
+
+#### 7.2.4 Capturing & Using Screenshots as Stickers (with Dream Project)
+
+1. While playing, the user takes screenshots as usual (via platform or emulator tools).
+2. When they want to “turn them into something”, they:
+   - open the game page in Dream Project,
+   - go to the **Sticker Albums** section,
+   - choose an album template (e.g. “main bosses”, “secret areas”, “endings”).
+3. For each empty slot in the album:
+   - they upload one of their screenshots,
+   - optionally add a short caption.
+4. Dream Project runs **AI-based validation** to check whether:
+   - the screenshot roughly matches the described slot (boss, area, event),
+   - the image is not obviously wrong (different game, menu screen, unrelated content).
+5. If accepted:
+   - the slot is marked as filled,
+   - album completion percentage updates,
+   - the user’s profile stats are updated (e.g. “Album X: 7/10 stickers filled”).
+6. Completed albums (or key milestones) can grant:
+   - profile badges,
+   - visible markers that can be shared or referenced by content creators.
+
+   ---
+<br>
+
+#### 7.2.5 Creating & Maintaining Community Structures (with Dream Project)
+
+1. A curator decides to formalise their knowledge of a game into:
+   - a fan achievement set,
+   - and/or a sticker album template.
+2. In Dream Project, they open curator tools for that game and:
+   - define achievement/challenge items with names, descriptions, and categories,
+   - group them into subsets or challenge branches where necessary,
+   - or create an album template with defined sticker slots.
+3. They can attach:
+   - short hints or notes,
+   - external links (GameFAQs, videos) to help players.
+4. Once published:
+   - the set or album appears on the game page,
+   - players can start using it immediately.
+5. Over time, the curator can:
+   - review usage stats (how many started/completed),
+   - refine descriptions or balance,
+   - publish new versions if needed (with version history preserved).
+6. For Ukrainian-focused curators and communities:
+   - they can explicitly tag content as Ukrainian,
+   - prioritise games with Ukrainian localisation or origin,
+   - and avoid or flag Russian-linked titles according to catalogue policies.
+
+---
+<br>
+
+These TO-BE process summaries will be expanded into more formal **use cases**, **user stories**, and **process diagrams** in later artefacts (Use Case Specifications, SRS, and visual models). Here, they provide the business narrative that those detailed specifications must support.
 
 ---
 <br>
 <br>
 
-## Assumptions & Constraints
+## 8. Business Rules
 
-### Assumptions
-- **Access to Game Metadata**  
-  We’re counting on modern platforms (Steam, Epic Games, etc.) to expose achievement and save data via their APIs, and on popular retro emulators (RetroArch, Dolphin, PCSX2) to offer plugins or memory-reader hooks for extracting save snapshots and custom triggers.
+This section captures the main **business-level rules** that govern how Dream Project should behave.  
+They will later be refined and extended in the BRD and SRS, but the principles here must remain valid regardless of technical implementation.
 
-- **Emulator Integration**  
-  A set of popular emulators will be supported at launch, with community‑maintained plugins available for data parsing.
+---
+<br>
 
-- **Active Community Participation**  
-  Curators, list creators, and regular users within both English‑speaking and Ukrainian communities will actively contribute to content creation, moderation, and validation processes.
+### 8.1 User Accounts & Roles
 
-- **User Technical Competence**  
-  Users know how to export saves from their retro emulators and capture/upload screenshots without hand-holding.
+- **Roles and Permissions**
+  - **Regular Users**
+    - May register an account, manage their profile and preferences.
+    - May search and view game pages, saves, achievement sets, and sticker albums.
+    - May upload their own saves and screenshots, and decide whether they are private or shared.
+    - May join and track fan achievement sets and fill sticker albums.
+    - May rate or report content and leave feedback where enabled.
+    - May link and unlink external gaming profiles (where integrations exist).
+  - **Curators**
+    - Have all capabilities of Regular Users.
+    - May create, edit, and publish **fan achievement sets** for specific games.
+    - May create, edit, and publish **sticker album templates** for specific games.
+    - May deprecate or update their own sets and templates, with version history preserved.
+    - May propose catalogue tags and corrections (e.g. localisation info, Ukrainian origin flags), subject to admin review.
+  - **Platform Administrators**
+    - Have all capabilities of Curators.
+    - May manage user roles (promote/demote curators, suspend accounts when required).
+    - May configure catalogue policies (e.g. flags for Russian-linked content).
+    - May review and act on reported content (hide, delete, warn, restrict).
+    - May configure high-level system settings (e.g. retention defaults, feature toggles).
 
-- **Reliable AI Validation**  
-  Automated image-verification service should hit at least 90% accuracy in matching uploads to the templates defined by curators.
+- **Account Linking**
+  - Linking external gaming profiles (Steam, retro services, etc.) is **optional** and requires explicit user consent.
+  - Linked accounts are used in a **read-only** way for progress synchronisation; Dream Project does not modify data in external systems.
+  - Users can revoke linked accounts at any time; after revocation, no new data is fetched and existing imported data is clearly marked as “last synchronised at \<date\>”.
 
-- **Stable Internet Connectivity**  
-  End users have a dependable connection for uploading and downloading saves, achievements, and screenshots.
+- **Progress Visibility**
+  - Each user profile shows high-level statistics about their activity (e.g. completed sets, completed albums, notable badges).
+  - Users can control whether their profile is:
+    - public,
+    - visible only to logged-in users,
+    - or limited to “private with shareable link” where feasible.
 
-### Constraints
-- **Team & Timeline**  
-  MVP development is limited to a four-person team (two developers, one business analyst, one QA engineer) over six months.
+---
+<br>
 
-- **Fixed Budget**  
-  Total MVP budget is capped at $45K, covering personnel, infrastructure, and essential tooling. Anything beyond the MVP features needs new funding.
+### 8.2 Save Management Rules
 
-- **Emulator Support Scope**  
-  Only pre-selected list of emulators will be integrated in Phase I; support for others or proprietary tools comes later in Phase II.
+- **Save Identification**
+  - Every shared save must be associated with:
+    - a specific **game** entry,
+    - a specific **platform variant** (e.g. PC, PS1, SNES),
+    - and, where relevant, a version/region tag.
+  - Each save must include a short human-readable description of its situation (e.g. “before final faction choice”, “post-boss X, level 60 mage build”).
 
-- **API Limitations**  
-  External APIs may throttle requests or require licensing—so manual data-entry must be available as a fallback.
+- **Ownership & Visibility**
+  - By default, uploaded saves are private to the uploader until they explicitly mark them as **shared**.
+  - The uploader can:
+    - change a shared save back to private,
+    - or delete their own saves.
+  - Administrators may hide or remove saves that violate policies or are clearly misleading or harmful.
 
-- **Browser Compatibility**  
-  Support the latest versions of Chrome, Firefox, and Edge. Legacy browsers and mobile-only interfaces are out of scope for the MVP.
+- **Discovery & Use**
+  - Shared saves are searchable by game, platform, and basic metadata (e.g. route, difficulty, key story points).
+  - Dream Project must present **clear, platform-specific instructions** for how to use a downloaded save.
+  - Where technical risk exists (e.g. overwriting local progress), the interface must display a **prominent warning**.
 
-- **Storage & Retention**  
-  User storage quotas and a global cap keep us within budget. Saves not accessed for a year will be archived, while sticker-album images stay indefinitely (within quota limits).
+- **Versioning & Retention**
+  - Users may keep multiple versions of saves per game; older versions may be archived or compressed according to configurable platform policies.
+  - Saves that have not been accessed for a long period may be archived, with prior notice to the owner where feasible.
 
-- **Regulatory Compliance**  
-  Must adhere to GDPR-style privacy rules and offer DMCA takedown processes for copyrighted content.
+- **Reporting & Moderation**
+  - Any signed-in user may report a save for:
+    - corruption or non-functioning file,
+    - malware suspicion,
+    - misleading description,
+    - policy violations.
+  - Reported saves are marked with a warning until reviewed by an administrator.
+  - Administrators may:
+    - remove the save,
+    - correct its metadata,
+    - or leave it visible with an explanatory note if the report is not confirmed.
 
-- **Security & Performance**  
-  All data must be encrypted in transit and at rest. Public APIs will be rate-limited to 1,000 requests/hour per key, and the system must support at least 500 concurrent users without slowing down.  
+---
+<br>
+
+### 8.3 Achievement & Goal Tracking Rules
+
+- **Official vs Fan-Made Structures**
+  - Where supported, **official achievements** for a game are imported or represented as a read-only reference list.
+  - **Fan-made achievement sets** are first-class objects in the system and:
+    - can be created and maintained by Curators,
+    - are clearly labelled as fan-made, with author attribution,
+    - can coexist with each other and with official lists for the same game.
+
+- **Integrations for Retro / Emulator Sets**
+  - For retro games supported by external achievement services (e.g. RetroAchievements or similar):
+    - Dream Project may mirror those achievement sets as structured lists.
+    - Completion status is imported from the linked external profile in a **read-only** way.
+    - Users cannot override externally synchronised completion flags for these items inside Dream Project.
+    - Any changes in completion status must originate from the external service and be refreshed by synchronisation.
+
+- **Set Structure & Variants**
+  - Multiple fan-made sets per game are allowed.
+  - Sets may contain:
+    - base lists,
+    - optional subsets (e.g. “low-level subset”, “no-death subset”),
+    - tags indicating their focus (exploration, challenges, collectibles, etc.).
+  - Each achievement item must have:
+    - a clear name,
+    - a description of the condition,
+    - optional notes or hints.
+
+- **Completion Tracking**
+  - For **official lists**:
+    - where integrations exist, completion status may be updated automatically from external profiles (read-only).
+    - where integrations do not exist, users may **optionally self-report** completion.
+  - For **external retro / emulator sets** (e.g. mirrored from RetroAchievements):
+    - completion status is taken exclusively from the external profile once linked,
+    - users cannot manually mark these items complete or incomplete in Dream Project,
+    - if the user unlinks the external profile, the last known completion state remains visible but is clearly marked as “from external source, last updated \<date\>”.
+  - For **Dream Project–native fan-made sets**:
+    - users can mark items as completed.
+    - for each completed item, users may attach **one or more pieces of evidence**, such as:
+      - a screenshot (or reference to an existing sticker slot),
+      - a save file or link to a save hosted on Dream Project,
+      - a link to an external video or game clip (e.g. file-sharing or clip platforms).
+    - attaching evidence is optional for normal use but may be required for any future “verified completion” statuses if such features are introduced.
+  - The system should calculate completion status per set and may store:
+    - completion timestamps,
+    - approximate time taken from first recorded action to full completion.
+
+- **Verification & Trust Model**
+  - Dream Project’s default model is **trust with light verification**:
+    - self-reported completion is accepted for native fan sets and non-integrated official lists,
+    - attached evidence is primarily for social proof and community trust.
+  - For evidence (screenshots, videos) the system may:
+    - use AI-based checks to detect obviously unrelated content (wrong game, menus, unrelated footage),
+    - highlight questionable items for manual review only in specific cases (e.g. suspected abuse, special badges, or repeated reports).
+  - The platform does **not** aim to provide strict anti-cheat guarantees; it aims to keep data reasonably trustworthy without requiring a large manual moderation team.
+
+- **Quality & Feedback**
+  - Users may:
+    - rate fan-made sets (e.g. helpfulness, clarity),
+    - report items that are unclear, impossible, or in violation of policy.
+  - Low-rated or frequently reported sets may be flagged for curator or admin review.
+  - Curators can publish revised versions of sets; older versions remain reference-only.
+
+- **Content Rules**
+  - Achievement sets must:
+    - describe goals that can be achieved within normal game use (no requirement for cheating, exploiting platform vulnerabilities, or using prohibited tools),
+    - respect content and community guidelines (no hate, harassment, or prohibited themes).
+  - Administrators may remove or require changes to sets that violate these rules.
+
+---
+<br>
+
+### 8.4 Sticker Album & Screenshot Rules
+
+- **Album Templates**
+  - Sticker album templates are defined per game (and, where relevant, platform variant) by Curators.
+  - Each template:
+    - defines a finite set of **slots** (e.g. one per boss, area, ending, secret),
+    - includes descriptions and optional spoiler warnings for each slot,
+    - may include tags (e.g. “main story album”, “secret endings album”).
+
+- **Album Types & Spoiler Levels**
+  - Each album template must be assigned a **type**, for example:
+    - **“First Playthrough Friendly”** – designed for new players; descriptions avoid heavy spoilers and focus on gentle hints.
+    - **“Post-Completion / Deep Dive”** – intended for players who have already finished the game; descriptions may be explicit about bosses, endings, and secrets.
+  - For each slot, curators may define:
+    - a short **hint text** (minimal spoilers, intended for first-playthrough use),
+    - a full **detailed description** (which may contain spoilers).
+  - For “First Playthrough Friendly” albums:
+    - the UI should initially show only the hint text,
+    - the full description is hidden behind a spoiler toggle so users can choose how much information they want.
+  - For “Post-Completion / Deep Dive” albums:
+    - the full description may be shown by default, with spoiler labelling where appropriate.
+
+- **Guidance So Players Don’t Miss Key Moments**
+  - For each album template, Dream Project may provide a **“next suggested slot”** view that:
+    - lists upcoming slots in a recommended order (e.g. main story sequence),
+    - shows only the non-spoiler hints for first-playthrough albums (e.g. “First major boss encounter – remember to capture something during the fight”),
+    - lets users mark slots as “planned” or “already passed” to help them track what they still want to capture.
+  - This guidance is provided **inside Dream Project’s UI** (web/mobile) before or between play sessions; it does not require or assume any in-game overlay on consoles or external platforms.
+  - It is understood that some players may still miss moments or use internet images instead of personal screenshots; the system aims to reduce accidental misses without trying to enforce perfect behaviour.
+
+- **Filling Albums**
+  - Users fill slots by:
+    - uploading their own screenshots,
+    - or, where supported, reusing screenshots they previously uploaded for that game.
+  - Each uploaded screenshot is associated with:
+    - a specific slot,
+    - the game and platform variant,
+    - the user who uploaded it.
+
+- **Validation & Spoilers**
+  - An AI-based validation step is used to check whether a screenshot reasonably matches the intended slot (scene, character, location).
+  - If validation clearly fails, the user is informed and may:
+    - retry with a different screenshot,
+    - or, for borderline cases, request manual review (subject to platform capacity).
+  - Images marked as potentially containing spoilers or sensitive content are:
+    - auto-blurred or hidden behind a spoiler layer,
+    - only revealed when the viewer explicitly chooses to see them.
+
+- **Completion & Statistics**
+  - Album completion is calculated based on filled slots.
+  - Completing an album may:
+    - unlock a game-specific badge on the user profile,
+    - contribute to overall completion statistics for that game.
+  - The system may display aggregated statistics such as:
+    - percentage of users who completed an album,
+    - typical time from first sticker to full completion (in an anonymised way).
+
+- **Content Ownership & Authenticity**
+  - Users remain the owners of the screenshots they upload.
+  - Users may delete their own screenshots and filled slots; albums will reflect such changes.
+  - Administrators may remove screenshots that violate content policies.
+  - The system cannot guarantee that every screenshot was taken personally by the uploader, but:
+    - AI validation and community reporting should be used to discourage clearly mismatched or deceptive content,
+    - any stricter “verified” status (if introduced) must rely on stronger checks than regular slot filling.
+
+---
+<br>
+
+### 8.5 Catalogue & Localisation Rules
+
+- **Game Entries**
+  - Each game entry must include:
+    - title and basic metadata,
+    - one or more platform variants,
+    - available language/localisation information where known.
+  - Where possible, entries should record:
+    - developer and publisher,
+    - country/region information.
+
+- **Russian-Linked Content (Metadata & Visibility)**
+  - The platform must support explicit metadata fields for Russian-linked content (e.g. developer or publisher registered in Russia, or other clear associations).
+  - How this metadata is **displayed** can depend on the user’s locale and preferences:
+    - For users who choose a Ukrainian language interface (or explicitly opt in), Russian-linked flags and explanatory notes should be clearly visible and filterable.
+    - For other users, Russian-linked metadata may be:
+      - less prominent by default,
+      - still available via filters or info panels for those who want to see it.
+  - Global catalogue policies (e.g. exclusion from certain views) are configured by Platform Administrators; regular users and curators do not decide policy, but can see and use the results.
+
+- **Ukrainian Localisation & Origin**
+  - Games with official Ukrainian localisation must be:
+    - clearly marked in the catalogue,
+    - filterable for users who want to focus on such titles.
+  - Games developed by Ukrainian teams or strongly associated with Ukraine should:
+    - be tagged accordingly,
+    - be eligible for special highlighting in Ukrainian-focused views or campaigns.
+  - These tags are primarily maintained by Platform Administrators or dedicated catalogue maintainers; users and curators can suggest corrections, but are not responsible for maintaining this data.
+
+- **Responsibility for Classification**
+  - Responsibility for classifying games as Russian-linked or Ukrainian-origin lies with:
+    - the platform’s catalogue/data maintainers,
+    - and Platform Administrators who approve or adjust sensitive metadata.
+  - Curators:
+    - are **not required** to research or decide on Russian/Ukrainian classifications as part of their normal curation work,
+    - may optionally propose corrections if they notice obvious mistakes, via a simple suggestion mechanism.
+  - Sensitive changes (e.g. adding or removing a Russian-linked flag, marking a game as Ukrainian origin) must go through an admin review process.
+
+- **Curator Proposals**
+  - Curators and regular users may propose corrections or additions to catalogue metadata (e.g. incorrect localisation info, missing Ukrainian language support).
+  - All proposals affecting sensitive fields (Russian-linked status, Ukrainian origin) require explicit approval from Platform Administrators or catalogue maintainers before becoming visible to all users.
+
+---
+<br>
+
+### 8.6 Moderation & Reporting Rules
+
+- **Reportable Items**
+  - The following content types can be reported by users:
+    - saves,
+    - screenshots and album slots,
+    - achievement sets and individual items,
+    - album templates,
+    - user comments or profile content (where applicable).
+
+- **Reporting Workflow**
+  - Any signed-in user can submit a report with:
+    - a reason category (e.g. corruption, misleading, offensive content),
+    - optional free-text explanation.
+  - Reported items are:
+    - marked as “under review” or shown with a warning,
+    - still visible unless they pose clear legal or safety risks, in which case admins may hide them immediately.
+
+- **Administrative Actions**
+  - Admins may:
+    - keep content as-is (closing the report),
+    - edit metadata or mark items as deprecated,
+    - hide or delete content,
+    - apply user-level actions (warnings, temporary restrictions, permanent bans) for repeated or severe violations.
+  - All moderation actions should be logged for audit purposes.
+
+- **Appeals**
+  - Content owners may request a review of moderation decisions within a defined time window (e.g. 7 days).
+  - Where possible, a different admin should handle appeals to avoid direct self-review.
+
+---
+<br>
+
+### 8.7 Data & Privacy Rules (Business View)
+
+- **User Control**
+  - Users must be able to:
+    - download or export their own content and basic profile data upon request,
+    - delete their account (subject to legal and safety constraints),
+    - remove individual uploads (saves, screenshots) they own.
+
+- **Minimal Data Principle**
+  - Dream Project collects and stores only the personal data necessary to:
+    - operate accounts and roles,
+    - provide progress tracking features,
+    - comply with legal and security obligations.
+  - Linking external profiles is optional and limited to the minimum scope needed for read-only progress synchronisation.
+
+- **Retention**
+  - Public saves and content that have been inactive for a long period may be archived or removed according to platform policies, with reasonable attempts to notify content owners beforehand.
+  - Core profile and progress data are stored as long as the account is active or as required by applicable regulations; after account deletion, remaining data should be anonymised or removed where feasible.
+
+- **Security & Compliance**
+  - Personal data and user-generated content must be protected with appropriate security measures (e.g. encryption in transit and at rest, access controls).
+  - The platform must follow privacy regulations applicable to its target regions and clearly communicate key terms in its public-facing policies.
 
 ---
 <br>
 <br>
 
-## High-Level Business Requirements
+## 9. Data & Information View
 
-Below are the must-have capabilities (what the platform does) and quality attributes (how it performs) for Dream Project.
+This section describes the main **business information objects** used by Dream Project and how they relate to each other.  
+It is a **conceptual view**, not a database design: the goal is to clarify *what information the platform cares about* and *how it hangs together*.
 
-### Functional Requirements
+---
+<br>
 
-**Save Management**  
-- Players can upload, download, and securely store game save files with full metadata (title, platform, version, playtime, chapter).  
-- Browse, filter, and sort saves by game, progress markers, popularity, or creator.  
-- Keep up to 25 versions per game, with options to archive, restore, or delete older saves.  
-- Community feedback is built in—anyone can like, dislike, or report a save, and flagged items display a warning banner until reviewed.
+### 9.1 Conceptual Overview
 
-**Achievement & Milestone Tracking**  
-- Automatically import and label official achievements via platform APIs.  
-- Create, edit, and collaboratively version multiple fan-made achievement lists per game.  
-- Comment on and rate lists; low-rated or flagged lists enter a moderation queue.  
-- Each achievement has its own page with criteria descriptions, media attachments, tags (e.g., “storyline,” “irreversible”), and completion stats (users and timestamps).
+At a high level, Dream Project’s data model revolves around four groups of objects:
 
-**Sticker Album Collection**  
-- Curators design custom album templates (locations, characters, plot elements) with optional spoiler notices.  
-- Players drag-and-drop screenshots into template slots once they meet in-game criteria; an AI check verifies content consistency.  
-- Albums display completion percentages, award badges, and feature leaderboards showing avatars, nicknames, and timestamps.  
-- Spoiler images stay blurred until a user chooses to reveal them.
+1. **Catalogue & Context** – *what* exists in the world of games:
+   - Game, Platform Variant, Localisation & Origin metadata, Catalogue Tags.
 
-**User Profiles & Progress Tracking**  
-- Profiles automatically showcase recent game activity, overall completion stats, counts of completed achievement sets and sticker albums, badges earned, and time-to-complete metrics.
+2. **Users, Roles & Profiles** – *who* is using the platform:
+   - User Account, User Profile, Role Assignments, External Profile Links.
 
-**Moderation & Reporting**  
-- Role-based access for Regular Users, List Creators, Curators, and Administrators.  
-- A centralized moderation queue handles all reported content, and content owners can appeal removal decisions within seven days.
+3. **Progress & Evidence** – *what users have actually done*:
+   - Saves, Achievement Sets & Items, Completion Records, Sticker Albums, Screenshots, Evidence Links.
 
-**API & Integration**  
-- Provide RESTful endpoints for save management, achievements, albums, and user profiles.  
-- Enforce a 1,000-requests/hour rate limit per API key, with manual data-entry fallbacks when external APIs hit their limits.
+4. **Governance & Moderation** – *how the platform stays safe and compliant*:
+   - Reports, Moderation Decisions, Catalogue Policy Flags (e.g. Russian-linked, Ukrainian-origin).
 
-### Non-Functional Requirements
+The following subsections describe these objects in business terms.
 
-**Performance & Scalability**  
-- Support a minimum of 500 concurrent users without noticeable lag.  
-- Automatically scale storage and compute resources based on demand.
+---
+<br>
 
-**Security & Compliance**  
-- Encrypt all data in transit and at rest; comply with GDPR-like privacy standards and offer DMCA takedown workflows.  
-- Implement OAuth2 (or an equivalent) for authentication and authorization.
+### 9.2 Catalogue & Context Entities
 
-**Availability & Reliability**  
-- Maintain at least 99.5% uptime, with fault-tolerant design and disaster recovery plans.
+#### 9.2.1 Game
 
-**Localization & Accessibility**  
-- Offer full English and Ukrainian UI localization; meet WCAG 2.1 AA accessibility guidelines.
+Represents a distinct game title as understood by players (e.g. *Final Fantasy X*, *Silent Hill 2*, *Hollow Knight*).
 
-**Maintainability**  
-- Modular architecture with clear separation of concerns; comprehensive logging and monitoring.
+**Key aspects:**
+
+- Name, alternative titles (regional names, abbreviations).
+- Generic description / summary.
+- High-level genre and tags (RPG, JRPG, Metroidvania, horror, etc.).
+- Canonical release year (for reference and recommendations).
+
+**Relationships:**
+
+- A **Game** has one or more **Platform Variants**.
+- A **Game** can have multiple **Sticker Album Templates** and multiple **Fan Achievement Sets**.
+- A **Game** is linked to localisation and origin metadata (e.g. “has official Ukrainian localisation”, “developed by Ukrainian studio”).
+
+---
+<br>
+
+#### 9.2.2 Platform Variant
+
+Represents a specific combination of **game + platform** (e.g. *Final Fantasy X – PS2*, *Final Fantasy X – PS4 Remaster*, *Hollow Knight – PC*).
+
+**Key aspects:**
+
+- Platform type (PC, PS1, PS2, SNES, Switch, etc.).
+- Specific edition/remaster identifiers if needed.
+- Compatibility and version notes relevant to saves and screenshots (e.g. saves from PS2 NTSC may not work with PS2 PAL).
+
+**Relationships:**
+
+- Each **Platform Variant** belongs to exactly one **Game**.
+- Saves, screenshots, albums and some achievement sets may be scoped to a specific **Platform Variant**.
+
+---
+<br>
+
+#### 9.2.3 Localisation & Origin Metadata
+
+Business-level metadata describing **language and origin context**, especially for Ukrainian users.
+
+**Key aspects:**
+
+- Localisation info:
+  - “Has official Ukrainian localisation” (yes/no/unknown).
+  - Available languages list.
+- Origin info:
+  - Developer and publisher,
+  - Country/region associations (e.g. Ukrainian developer, Russian publisher).
+
+**Relationships:**
+
+- Linked to **Game** (generic info) and/or **Platform Variant** (platform-specific localisation differences).
+- Provides inputs for catalogue rules:
+  - Ukrainian highlighting,
+  - Russian-linked flags and filters.
+
+---
+<br>
+
+#### 9.2.4 Catalogue Tag
+
+Represents a reusable **tag** used throughout the catalogue.
+
+**Examples:**
+
+- Content tags: “retro”, “JRPG”, “survival horror”.
+- Context tags: “Ukrainian localisation”, “Ukrainian developer”.
+- Policy tags: “Russian-linked”.
+
+**Relationships:**
+
+- Tags may be attached to **Games**, **Platform Variants**, **Album Templates**, **Fan Sets**, etc.
+- Tag assignments may be proposed by Curators or users, but sensitive tags are approved by Platform Administrators.
+
+---
+<br>
+
+### 9.3 User, Role & Profile Entities
+
+#### 9.3.1 User Account
+
+Represents the authenticated identity of a person using Dream Project.
+
+**Key aspects:**
+
+- Login credentials / authentication method (not detailed here).
+- Basic contact/notification preferences.
+- Status (active, suspended, deleted).
+
+**Relationships:**
+
+- Each **User Account** is associated with exactly one **User Profile**.
+- A **User Account** may have one or more **Role Assignments**.
+- A **User Account** may have multiple **External Profile Links**.
+
+---
+<br>
+
+#### 9.3.2 User Profile
+
+Represents the visible “face” of a user on the platform (nickname, avatar, basic stats).
+
+**Key aspects:**
+
+- Display name, avatar, optional bio.
+- Visibility settings (public / members-only / restricted).
+- High-level stats:
+  - number of completed achievement sets,
+  - number of completed sticker albums,
+  - badges (e.g. “completed X albums”, “curator for Y game”).
+
+**Relationships:**
+
+- A **User Profile** belongs to one **User Account**.
+- A **User Profile** is the subject of:
+  - **Completion Records** (for achievements and sets),
+  - **Sticker Album Instances**,
+  - **Save Entries** (created or shared),
+  - **Screenshots** uploaded.
+
+---
+<br>
+
+#### 9.3.3 Role Assignment
+
+Represents the link between a **User Account** and a **role** (Regular User, Curator, Platform Administrator).
+
+**Key aspects:**
+
+- Role type (e.g. Regular User, Curator, Platform Administrator).
+- Date when the role became effective (e.g. when a user was promoted to Curator or Admin).
+- Current status (active / revoked) if roles can change over time.
+
+**Relationships & Visibility:**
+
+- A **User Account** may have multiple **Role Assignments** over its lifetime (e.g. Regular User → Curator).
+- Technical details of who changed which role are kept internally for admin/audit purposes, but not exposed in business-facing documentation.
+- On the **user-facing profile**, the main visible effects of role assignments are:
+  - role badges or labels (e.g. “Curator”),
+  - summary of contributions relevant to that role (e.g. number of achievement sets or sticker albums created by that curator).
+
+---
+<br>
+
+#### 9.3.4 External Profile Link
+
+Represents a connection between a **User Account** and an external gaming or achievement service (e.g. Steam, RetroAchievements).
+
+**Key aspects (internal view):**
+
+- External service identifier (Steam, RetroAchievements, etc.).
+- External account reference (ID or username) stored securely and used only for synchronisation.
+- Status (linked, revoked).
+- Date of last synchronisation and basic scope of imported data (e.g. “official achievements only”).
+
+**Relationships & Visibility:**
+
+- Each **External Profile Link** belongs to one **User Account**.
+- External links are used by:
+  - achievement import processes,
+  - retro set completion synchronisation.
+
+**User-facing behaviour & privacy:**
+
+- Only the **account owner** sees detailed information about linked external accounts (which services are linked, and controls to unlink them).
+- Other users:
+  - **do not** see external usernames or IDs,
+  - only see aggregated results (e.g. which official achievements are completed) as part of normal profile and game views.
+- Dream Project must avoid exposing information that would help someone compromise external accounts; external identifiers are used internally for read-only sync and are not shown publicly.
+
+---
+<br>
+
+### 9.4 Saves & Progress Evidence Entities
+
+#### 9.4.1 Save Entry
+
+Represents an **uploaded save** that Dream Project knows about (private or shared).
+
+**Key aspects:**
+
+- Game and Platform Variant.
+- Human-readable description (situation, route, build).
+- Ownership (which user uploaded it).
+- Visibility (private/shared).
+- Basic metadata (e.g. in-game progress markers when available: chapter, level, difficulty).
+
+**Relationships:**
+
+- Each **Save Entry** belongs to one **User Profile** (owner).
+- Each **Save Entry** is tied to a specific **Platform Variant**.
+- A **Save Entry** may be linked as **evidence** for:
+  - Completion of one or more **Achievement Items**,
+  - Specific slots in a **Sticker Album** (if relevant).
+
+---
+<br>
+
+#### 9.4.2 Save Version (optional conceptual object)
+
+In some designs, multiple file versions or updates of the same logical save are stored.
+
+**Key aspects:**
+
+- Version identifier, creation date.
+- Technical file details (not detailed at BA level).
+
+**Relationships:**
+
+- A **Save Entry** may have many **Save Versions**, with one marked as “current”.
+
+---
+<br>
+
+#### 9.4.3 Screenshot / Media Asset
+
+Represents an uploaded image (or, later, potentially short clips).
+
+**Key aspects:**
+
+- Owner (User Profile).
+- Associated Game and Platform Variant.
+- Basic description/caption.
+- Flags (e.g. potential spoiler, NSFW, policy risk).
+
+**Relationships:**
+
+- A **Screenshot** may be:
+  - linked to one or more **Sticker Slots** (as part of album filling),
+  - linked as evidence for **Achievement Item** completion.
+- A **Screenshot** belongs to one **User Profile**.
+
+---
+
+### 9.5 Achievement & Completion Entities
+
+#### 9.5.1 Achievement Source
+
+Represents the **origin type** of an achievement structure:
+
+- Official platform list (Steam/console achievements).
+- External retro services (e.g. RetroAchievements).
+- Dream Project–native fan-made sets.
+
+This can be a conceptual attribute applied to sets/items rather than a separate entity in implementation, but is important to distinguish in analysis.
+
+---
+<br>
+
+#### 9.5.2 Achievement Set
+
+Represents a **group of achievements or challenges** related to a Game (and optionally a Platform Variant).
+
+**Examples:**
+
+- Official list: “Steam Achievements for Game X”.
+- Retro external set: “RetroAchievements set for Game Y (SNES)”.
+- Fan-made sets: “True 100% Route”, “Low-Level Challenge Subset”.
+
+**Key aspects:**
+
+- Game (and optionally Platform Variant).
+- Source type (official / external retro / fan-made).
+- Author/owner (for fan-made sets).
+- Status (active, deprecated, superseded).
+- Descriptive metadata (theme, difficulty, recommended audience).
+
+**Relationships:**
+
+- A **Game** may have multiple **Achievement Sets**.
+- A **Platform Variant** may narrow which sets apply (especially for retro sets).
+- Each **Achievement Set** contains multiple **Achievement Items**.
+- Completion for a set is tracked via **Completion Records** (aggregated over items).
+
+---
+<br>
+
+#### 9.5.3 Achievement Item
+
+Represents a **single achievement or challenge condition**.
+
+**Key aspects:**
+
+- Name and description.
+- Optional notes/hints.
+- Category tags (story, collectible, challenge, etc.).
+- For external sources:
+  - external ID,
+  - read-only status.
+
+**Relationships:**
+
+- Belongs to exactly one **Achievement Set**.
+- May have many **Completion Records** (one per user who interacts with it).
+- May have associated **Evidence Links** (screenshots, saves, external clips).
+
+---
+<br>
+
+#### 9.5.4 Completion Record
+
+Represents a **user’s relationship** to an Achievement Item and, by aggregation, to an Achievement Set.
+
+**Key aspects:**
+
+- User Profile.
+- Achievement Item (and its set).
+- Completion status (not started / in progress / completed).
+- Timestamps (first recorded activity, completion time).
+- Flags indicating source of completion:
+  - imported from external official/retro service,
+  - self-reported with evidence,
+  - self-reported without evidence.
+
+**Relationships:**
+
+- Each **Completion Record** belongs to one **User Profile** and one **Achievement Item**.
+- May be linked to one or more **Evidence Links**.
+
+---
+<br>
+
+#### 9.5.5 Evidence Link
+
+Represents a connection between a **Completion Record** and the pieces of proof a user chooses to attach.
+
+**Key aspects:**
+
+- Evidence type:
+  - Screenshot (internal),
+  - Save Entry (internal),
+  - External clip URL (e.g. video hosting, file-sharing),
+  - Other future types if introduced.
+- Optional short description.
+
+**Relationships:**
+
+- Each **Evidence Link** belongs to one **Completion Record**.
+- Points to one **Screenshot**, **Save Entry**, or external URL.
+
+---
+<br>
+
+### 9.6 Sticker Albums & Visual Progress Entities
+
+#### 9.6.1 Sticker Album Template
+
+Represents the **design** of a sticker album for a specific game (and optionally platform variant).
+
+**Key aspects:**
+
+- Game (and optional Platform Variant).
+- Album type:
+  - “First Playthrough Friendly”,
+  - “Post-Completion / Deep Dive”, etc.
+- Description (what this album is about).
+- Author/curator and version status.
+
+**Relationships:**
+
+- A **Game** may have multiple **Sticker Album Templates**.
+- A **Sticker Album Template** contains multiple **Sticker Slot Definitions**.
+- Users create **Sticker Album Instances** based on templates.
+
+---
+<br>
+
+#### 9.6.2 Sticker Slot Definition
+
+Represents a **single slot** in a template that needs to be filled with a screenshot.
+
+**Key aspects:**
+
+- Name or identifier (e.g. “Boss 1”, “Secret Area – Hidden Garden”).
+- Hint text (non-spoiler guidance).
+- Detailed description (possibly spoiler-heavy).
+- Spoiler flags and content tags.
+
+**Relationships:**
+
+- Belongs to exactly one **Sticker Album Template**.
+- Instances of this slot for individual users are represented as **Sticker Slot Fills**.
+
+---
+<br>
+
+#### 9.6.3 Sticker Album Instance
+
+Represents one user’s **personal album** based on a template.
+
+**Key aspects:**
+
+- Owner (User Profile).
+- Template used.
+- Completion status and percentage.
+- Start and completion timestamps.
+
+**Relationships:**
+
+- Created from one **Sticker Album Template**.
+- Contains multiple **Sticker Slot Fills** (one per slot in the template).
+- Contributes to User Profile stats and potentially badges.
+
+---
+<br>
+
+#### 9.6.4 Sticker Slot Fill
+
+Represents a **user’s screenshot** filling a specific slot in their album instance.
+
+**Key aspects:**
+
+- Status (empty / filled / under review).
+- Associated screenshot.
+- Timestamps (when filled, last updated).
+- Validation state (accepted by AI, flagged, manually reviewed).
+
+**Relationships:**
+
+- Each **Sticker Slot Fill** belongs to one **Sticker Album Instance** and one **Sticker Slot Definition**.
+- References exactly one **Screenshot** (or is empty).
+- May indirectly serve as evidence for **Completion Records** if linked.
+
+---
+<br>
+
+### 9.7 Governance, Reporting & Policy Entities
+
+#### 9.7.1 Content Report
+
+Represents a **user-initiated report** about an item that may violate policy or be problematic.
+
+**Key aspects:**
+
+- Reported item reference (save, screenshot, achievement item/set, template, comment, profile).
+- Reporting user.
+- Reason category (e.g. corruption, inappropriate content, misleading, spam).
+- Optional free-text explanation.
+- Status (open, under review, resolved).
+
+**Relationships:**
+
+- Each **Content Report** refers to one target object.
+- Moderation actions are linked via **Moderation Decisions**.
+
+---
+<br>
+
+#### 9.7.2 Moderation Decision
+
+Represents an action taken by an administrator in response to a report or proactive review.
+
+**Key aspects:**
+
+- Target object reference.
+- Action taken (keep, edit metadata, hide, delete, warn user, restrict user, ban user).
+- Responsible administrator.
+- Date/time and rationale.
+
+**Relationships:**
+
+- May be linked to one or more **Content Reports**.
+- Influences state of the reported item and possibly **User Account** status.
+
+---
+<br>
+
+#### 9.7.3 Catalogue Policy Flag
+
+Represents specific **policy-related metadata** on catalogue objects.
+
+**Examples:**
+
+- “Russian-linked developer/publisher”.
+- “Ukrainian-origin game”.
+- “Contains Ukrainian localisation”.
+
+**Key aspects:**
+
+- Flag type.
+- Source of information (internal research, trusted external database, user suggestion reviewed by admin).
+- Approval status and audit trail.
+
+**Relationships:**
+
+- Attached primarily to **Game** and **Platform Variant** entities.
+- Used by:
+  - filters in the user interface (e.g. hide/show Russian-linked content),
+  - special Ukrainian-focused views or highlights.
+
+---
+<br>
+
+### 9.8 Traceability View
+
+From a business perspective, the information model must support **end-to-end traceability**, such as:
+
+- From a **User Profile** to:
+  - which **Games** they interacted with,
+  - which **Achievement Sets** and **Sticker Albums** they completed,
+  - which **Saves** they contributed.
+
+- From a **Game** to:
+  - its **Platform Variants**, **Album Templates**, **Fan Sets**,
+  - all **user activities** related to it (saves, completions, filled albums).
+
+- From a single **Achievement Item** or **Album Slot** to:
+  - every **Completion Record** or **Sticker Slot Fill** associated with it,
+  - evidence provided (screenshots, saves, clips).
+
+- From a **Report** or **Policy Flag** to:
+  - all affected content and users,
+  - decisions taken and their rationale.
+
+This traceability is essential for:
+
+- building trust in the data (users can see what their progress is based on),
+- supporting moderation and policy enforcement,
+- enabling meaningful analytics and product decisions based on real usage.
 
 ---
 <br>
 <br>
 
-## Glossary
 
-- **Save File**  
-  A snapshot of your game right where you left off (level, chapter, playtime, and so on).
+## 10. Assumptions & Constraints (BA-Level)
 
-- **Achievement**  
-  A milestone you unlock in-game. It can be an official trophy imported from the platform or a fan-made challenge dreamed up by the community.
+This section lists the **assumptions** and **constraints** that directly influence how requirements, processes, and data structures are defined for Dream Project.  
+More detailed, evolving items will be maintained in the separate **Risks, Assumptions & Constraints Register**; here we capture the stable, BA-level view.
 
-- **Fan-Made List**  
-  A custom collection of achievements created and maintained by players—perfect for adding extra challenges to your favorite games.
+---
+<br>
 
-- **Sticker Album**  
-  A themed digital scrapbook where you “stick” your best screenshots into slots defined by curators. Complete the album and earn badges!
+### 10.1 Key Business Assumptions
 
-- **Curator**  
-  A user role responsible for designing album templates, organizing content, and enforcing quality standards.
+#### 10.1.1 Users & Community
 
-- **List Creator**  
-  The architect of fan challenges—this role builds and edits custom achievement lists for the community to tackle.
+- There is a niche but motivated audience of:
+  - players who care about completion, retro gaming, and preserving their progress;
+  - community-minded people willing to act as curators and set creators.
+- Users will often adopt Dream Project for **one main pillar** first (saves, achievements, or sticker albums) and only later explore others.
+- A small group of early curators (global EN + Ukrainian) will be reachable via:
+  - existing communities (Discord servers, forums, RetroAchievements community, etc.),
+  - simple outreach (social posts, personal contacts),
+  - without needing a large marketing budget.
+- Users accept that Dream Project is an **overlay/companion**, not a replacement for stores or platforms:
+  - games are still purchased, installed, and launched elsewhere;
+  - Dream Project is primarily about tracking, preserving, and presenting progress.
 
-- **Regular User**  
-  Anyone who plays, backs up saves, tracks achievements, and builds sticker albums—without the extra powers of a curator or list creator.
+  ---
+<br>
 
-- **Platform Administrator**  
-  The gatekeeper and moderator—this role has full control over system settings, user management, and content moderation.
+#### 10.1.2 Ecosystem & Integrations
+
+- Major platforms (Steam, console ecosystems) and retro services (e.g. RetroAchievements) will continue to:
+  - expose some level of profile/achievement data through APIs or export mechanisms;
+  - allow **read-only** use of that data within the limits of their terms.
+- For MVP, only a **small number** of integrations will be supported:
+  - at least one modern platform for official achievements (if feasible),
+  - at least one retro achievement ecosystem.
+- There is no guarantee of long-term stability for third-party APIs; the system must tolerate integrations being temporarily unavailable or permanently removed (e.g. by degrading gracefully to manual tracking).
+
+---
+<br>
+
+#### 10.1.3 Catalogue & Content
+
+- A usable initial **game catalogue** (titles + platform variants) can be assembled using:
+  - one or more public or licensed data sources,
+  - manual curation for key titles, especially retro and “flagship” games.
+- Localisation and origin metadata (e.g. “has Ukrainian translation”, “Ukrainian developer”, “Russian-linked publisher”) can be identified for at least:
+  - major modern titles,
+  - selected classics/retro games important to the target audience.
+- Platform Administrators or dedicated catalogue maintainers, not curators in general, are responsible for:
+  - approving sensitive flags (Russian-linked, Ukrainian-origin),
+  - keeping high-impact catalogue metadata consistent over time.
+
+  ---
+<br>
+
+#### 10.1.4 Data, AI & Verification
+
+- AI-based checks (for screenshot validation, evidence plausibility, content risk) are treated as **assistance**, not as absolute truth:
+  - they may flag obviously wrong or suspicious content,
+  - they may occasionally misclassify borderline cases.
+- The platform’s **default trust model** is:
+  - self-reporting for fan-made sets + optional evidence,
+  - automatic imports where external services provide reliable completion data,
+  - light AI and community reporting to discourage abuse.
+- Dream Project is not positioned as an anti-cheat authority; minor inaccuracies in reported progress are acceptable as long as users generally feel the data is trustworthy and transparent.
+
+---
+<br>
+
+#### 10.1.5 Team, Operations & Moderation
+
+- The core team for MVP is **small** (1 product/BA, 1–2 engineers, 1 designer, 1 QA, part-time admins), which implies:
+  - moderation capacity is limited,
+  - manual reviews must focus on clearly prioritised cases (e.g. multiple reports, severe policy issues),
+  - self-service flows and automated checks are preferred where reasonable.
+- There will be enough available admin time to:
+  - handle critical moderation,
+  - review sensitive catalogue flags,
+  - manage curator promotions and role changes,
+  without offering 24/7 real-time support.
+
+---
+<br>
+
+### 10.2 Key Constraints
+
+#### 10.2.1 Scope & MVP Constraints
+
+- **MVP focus**:
+  - Web-based application (desktop and mobile web).
+  - No native mobile apps in the first release.
+  - No direct in-game overlays, hooks, or unofficial injectors for proprietary platforms.
+- Feature scope is constrained to:
+  - save upload/search/use for a **limited number of platforms** and formats,
+  - achievement tracking for official lists (where feasible) + a first wave of fan-made sets,
+  - basic sticker albums with AI-assisted validation,
+  - simple profiles and stats,
+  - essential moderation and reporting.
+- Out of scope for MVP:
+  - complex social features (friends lists, global chat, tournaments),
+  - leaderboards beyond basic aggregated statistics,
+  - automatic cross-platform save conversion,
+  - tournament-style competitions or prize systems.
+
+These constraints mean that some user needs will be deferred to later phases even if they are valid and aligned with the overall vision.
+
+---
+<br>
+
+#### 10.2.2 Technical & Integration Constraints
+
+- All integrations with external platforms and services must:
+  - be **read-only** from Dream Project’s perspective,
+  - comply with published terms and rate limits,
+  - avoid any behaviour that could be interpreted as cheating, scraping, or API abuse.
+- External usernames, IDs, and tokens are treated as **sensitive internal data**:
+  - they are stored securely,
+  - they are not displayed to other users,
+  - they are used only to fetch progress data and then reduced to aggregated, in-platform progress views.
+- The MVP infrastructure is sized for **modest traffic**:
+  - not engineered for tens of millions of users from day one,
+  - performance and scalability must be “good enough” for early adopters and testers, with clear upgrade paths later.
+
+  ---
+<br>
+
+#### 10.2.3 Legal, Policy & Localisation Constraints
+
+- The platform must operate under **GDPR-like privacy expectations**:
+  - clear consent for external account linking,
+  - ability for users to request export or deletion of their data (subject to legal/safety constraints),
+  - minimal collection and retention of personal information.
+- Catalogue policy around **Russian-linked content** and **Ukrainian-origin games** must:
+  - be centrally defined and configurable by Platform Administrators,
+  - avoid forcing political context on users who do not opt in, while still:
+    - clearly exposing this information to Ukrainian-language users and others who request it,
+    - allowing Ukrainian users to filter or avoid Russian-linked titles.
+- Content guidelines (for screenshots, achievement names/descriptions, comments) are a hard constraint:
+  - illegal, hateful, or otherwise prohibited content must be removable,
+  - sticker and achievement descriptions must avoid inciting cheating, harassment, or platform policy violations.
+
+  ---
+<br>
+
+#### 10.2.4 UX & Accessibility Constraints
+
+- Dream Project must remain usable for:
+  - players who are not technically inclined (no assumption that they know file paths or emulator internals),
+  - players accessing the site from a range of devices and screen sizes.
+- Documentation and UI text must:
+  - be understandable to both global EN users and Ukrainian users,
+  - avoid overloading users with BA or developer jargon,
+  - clearly explain when something is an **assumption** (“we can only detect X in this way”) versus a guaranteed system behaviour.
+- There is limited capacity for custom workflows per game; most flows should follow a **consistent pattern** across titles, with only metadata and templates varying.
+
+---
+<br>
+
+### 10.3 How This Section Is Used
+
+- When writing or reviewing requirements, we should ask:
+  - “Does this requirement rely on one of the assumptions above? If that assumption fails, what breaks?”
+  - “Is this requirement violating any of the constraints (scope, legal, technical, moderation capacity)?”
+- If critical assumptions are later proven false (e.g. an external API is removed, curator engagement is lower than expected), this section should be updated and linked to:
+  - the **Risks, Assumptions & Constraints Register**,
+  - any impacted requirements, processes, or data structures.
+
+This ensures that the Business Analysis Document remains honest about the environment in which Dream Project is being designed, and helps the team make consistent, realistic decisions about scope and behaviour.
+
+
+---
+<br>
+<br>
+
+## 11. Non-Functional Considerations (Business View)
+
+This section outlines the key **non-functional qualities** that Dream Project should achieve at MVP and beyond.  
+Technical details (specific SLAs, architecture choices, tools) will be defined in the SRS and implementation documents; here we focus on the **business expectations** behind them.
+
+---
+<br>
+
+### 11.1 Performance & Scalability
+
+From a user’s perspective:
+
+- Pages for **games, saves, achievements, and albums** should load quickly enough that the site feels responsive, even on average home connections.
+- Common interactions (searching games, filtering saves, marking achievements, filling album slots) should complete without noticeable delays in normal conditions.
+- The platform should comfortably support:
+  - a growing but still niche community (early adopters, curators, content creators),
+  - occasional spikes in traffic (e.g. when a specific game or feature becomes popular).
+
+From a business view, this means:
+
+- Prioritising fast responses for **read-heavy** operations (browsing, viewing profiles, game pages).
+- Accepting that some heavier operations (e.g. large AI validations, full re-sync from external APIs) may be slightly slower or handled asynchronously, as long as the UI communicates clearly what is happening.
+- Designing for **gradual scaling**: the MVP does not need “massive platform” capacity, but should not rely on choices that become impossible to scale later.
+
+---
+<br>
+
+### 11.2 Security & Privacy
+
+Non-functionally, Dream Project must be seen as **safe and trustworthy**:
+
+- User accounts:
+  - Protected with modern authentication practices.
+  - Guarded against common attacks (credential stuffing, simple brute force).
+- External account links:
+  - Treated as sensitive; tokens and identifiers must never be exposed to other users.
+  - Used strictly in **read-only** mode for progress synchronisation.
+- Personal data and user-generated content:
+  - Protected with appropriate encryption in transit and at rest.
+  - Access limited by role (Regular User, Curator, Admin) and only where necessary.
+
+Privacy expectations:
+
+- Clear explanation of:
+  - what data is collected,
+  - how it is used (e.g. progress tracking, statistics),
+  - how external accounts are linked and can be revoked.
+- Ability for users to:
+  - control profile visibility,
+  - remove their own uploads,
+  - request export or deletion of their data (within legal and safety limits).
+
+Business implication: users should **feel safe** linking their progress and uploading their content; lack of trust here would undermine the entire concept of long-term progress preservation.
+
+---
+<br>
+
+### 11.3 Reliability & Availability
+
+From the user’s point of view:
+
+- Dream Project should be reliably available for everyday use; unexpected downtime should be rare.
+- Critical flows (sign-in, viewing game pages, accessing own saves/achievements/albums) should work consistently.
+
+Business-level expectations:
+
+- Occasional maintenance windows are acceptable, but:
+  - they should be announced where possible,
+  - they should avoid data loss.
+- In case of failures:
+  - saves and progress records should not be corrupted or silently discarded,
+  - users should see clear error messages rather than broken pages.
+
+Backups & recovery (conceptual):
+
+- Regular backups of core data (catalogue, profiles, saves metadata, progress records).
+- A defined recovery approach so that accidental data loss can be minimised and corrected.
+
+---
+<br>
+
+### 11.4 Usability & Accessibility
+
+Dream Project targets players with **mixed technical skills**. Non-functionally:
+
+- Interfaces for:
+  - uploading saves,
+  - linking external profiles,
+  - filling albums,
+  must be understandable without requiring detailed knowledge of file systems, emulators, or APIs.
+- Controls and texts should:
+  - explain clearly what an action will do (“Share save”, “Mark as completed”, “Attach evidence”),
+  - avoid BA/dev jargon where possible.
+
+Accessibility considerations:
+
+- Layouts and controls should work on common desktop and mobile browsers.
+- Basic accessibility principles should be respected:
+  - text that is readable without zoom tricks,
+  - sensible contrast,
+  - navigation that does not rely solely on complex gestures.
+
+For Ukrainian and global EN users:
+
+- Key flows should be fully usable in both languages over time.
+- Where content is not fully localised yet, the UI should fail gracefully (e.g. not mixing random English fragments into Ukrainian text in a confusing way).
+
+---
+<br>
+
+### 11.5 Maintainability & Extensibility
+
+The platform is expected to evolve:
+
+- New integrations (new platforms, new retro services) may be added.
+- New types of albums, sets, or progress views may be introduced later.
+- Catalogue policies (especially around origin and localisation) may change over time.
+
+Non-functional expectations:
+
+- The core model (Games, Platform Variants, Sets, Albums, Profiles) should be stable enough that:
+  - new features can attach to it without major rewrites,
+  - most changes are additive rather than disruptive.
+- Configuration (e.g. catalogue flags, policy toggles) should be:
+  - editable by Platform Administrators without code changes where possible,
+  - traceable (who changed what, when).
+
+This is essential so that Dream Project can respond to community feedback and ecosystem changes without constantly “starting from scratch”.
+
+---
+<br>
+
+### 11.6 Localisation, Catalogue Policy & Ethical Behaviour
+
+Because Dream Project explicitly cares about Ukrainian users and catalogue context:
+
+- Localisation:
+  - The UI should support at least English and Ukrainian, with a clear path to add more languages later.
+  - Language settings should be explicit; system language should not silently override the user’s choice.
+- Catalogue policy:
+  - Sensitive metadata (Russian-linked publishers, Ukrainian origin, Ukrainian localisation) must be handled consistently.
+  - Filters and flags around this information should behave predictably and not “disappear” across different pages.
+- Ethical positioning:
+  - The platform should be transparent about what it shows and why (e.g. why certain games are flagged or filtered).
+  - Users who are not interested in this aspect should not be forced into it, but Ukrainian and other interested users must have reliable access to that information.
+
+Non-functionally, this is about **predictability and clarity**: the rules behind what appears in search, filters, and highlights should not feel arbitrary or opaque.
+
+---
+<br>
+
+### 11.7 Observability & Analytics (Business View)
+
+To steer the product, the team needs a **clear picture of usage**:
+
+- Basic analytics should show:
+  - which features are actually used (saves vs sets vs albums),
+  - which games and templates attract activity,
+  - how many users complete sets and albums vs abandon them.
+- Moderation metrics:
+  - volume and type of reports,
+  - patterns around problematic content.
+
+Non-functional expectations:
+
+- Analytics must respect privacy (no unnecessary tracking or invasive profiling).
+- Aggregated statistics, not per-user spying, should guide decisions.
+- The platform should provide enough internal visibility that:
+  - issues can be detected (e.g. a broken integration causing all imports to fail),
+  - new versions can be evaluated based on real user behaviour.
+
+---
+<br>
+<br>
+
+## 12. Impact on Stakeholders & Organisation
+
+This section summarises how Dream Project, even at MVP stage, **changes the world** for each key stakeholder group and for the organisation operating the platform.  
+It focuses on **practical impact**: new capabilities, responsibilities, and potential concerns.
+
+---
+<br>
+
+### 12.1 High-Level Impact Summary
+
+| Stakeholder Group                                   | Key Positive Impact                                             | Key New Responsibilities / Changes                          |
+|-----------------------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------|
+| Regular Players (Platform Users)                    | Better ways to reuse saves, track goals, and show progress      | Learning a new companion platform and its basic flows       |
+| Retro & Emulator-Focused Players                    | Centralised recognition for retro progress and saves            | Linking retro profiles; managing more structured data       |
+| Curators & Achievement/Album Set Creators           | Stable home for sets/albums, visibility and feedback            | Designing and maintaining structured content                |
+| Global Content Creators & Community Organisers (EN) | Clear references and stats for stories and community events     | Learning how to embed/point to Dream Project objects        |
+| Ukrainian Content Creators & Community Organisers   | Tools aligned with Ukrainian context & catalogue policies       | Using localisation/origin flags in their work               |
+| Platform Admins & Product Team                      | Concrete data for decisions; structured moderation and catalog  | Operating the platform, moderation, catalogue maintenance   |
+| External Services & Integration Partners            | Additional value/use of their data in a niche companion layer   | Monitoring integrations and enforcing their own policies    |
+
+---
+<br>
+
+### 12.2 Impact on Players
+
+#### 12.2.1 Regular Players (Platform Users)
+
+**Positive impact**
+
+- Gain a **single place** to:
+  - find situation-specific saves (e.g. branch points, post-boss checkpoints),
+  - see both official and fan-made completion structures for a game,
+  - turn screenshots into structured albums rather than raw image dumps.
+- Can selectively use the features they care about (only saves, only albums, only achievements) without committing to a full “lifestyle platform”.
+
+**Changes & responsibilities**
+
+- Need to:
+  - create and manage an additional account (Dream Project),
+  - learn how to upload/download saves safely,
+  - understand the difference between official progress, retro/external data, and fan-made tracking.
+- Are gently invited to attach **evidence** (screenshots, saves, clips) if they want more trust and richer profiles, which is extra effort compared to doing nothing.
+
+---
+<br>
+
+#### 12.2.2 Retro & Emulator-Focused Players
+
+**Positive impact**
+
+- Receive a **central, neutral place** where retro progress can live alongside modern games.
+- Can:
+  - import progress from retro achievement services,
+  - share and reuse retro saves in a more structured way,
+  - represent long retro runs via sticker albums and curated sets.
+
+**Changes & responsibilities**
+
+- Need to:
+  - link external retro profiles if they want automatic progress synchronisation,
+  - be slightly more disciplined about saves and screenshots (naming, descriptions) to benefit fully.
+- May adjust existing habits (forum posts, plain save-sharing) to take advantage of Dream Project’s structure.
+
+---
+<br>
+
+### 12.3 Impact on Curators & Content Creators
+
+#### 12.3.1 Curators & Achievement/Album Set Creators
+
+**Positive impact**
+
+- Gain **proper tools** for:
+  - defining structured achievement sets and subsets,
+  - designing sticker album templates,
+  - attaching hints and external resources.
+- Their work becomes:
+  - more **visible**, via attribution and statistics,
+  - more **persistent**, instead of being buried in chats or threads.
+
+**Changes & responsibilities**
+
+- Need to:
+  - learn the curator tooling and templates,
+  - maintain sets and albums as games are patched or better knowledge appears,
+  - respond (at least occasionally) to feedback or reports about their content.
+- Take on a semi-formal role within the community, influencing how many players experience a game’s “completion” path.
+
+---
+<br>
+
+#### 12.3.2 Global Content Creators & Community Organisers (EN)
+
+**Positive impact**
+
+- Gain **stable, shareable references** for:
+  - specific runs (achievement sets + evidence + albums),
+  - community challenges (“complete this fan set”),
+  - notable players’ profiles.
+- Can enrich content (articles, streams, videos) with:
+  - verifiable progress links,
+  - visual albums that summarise a playthrough.
+
+**Changes & responsibilities**
+
+- Need to:
+  - integrate Dream Project links into their existing communication channels,
+  - understand at a basic level how sets and albums work so they can explain them.
+- May become informal “ambassadors” of Dream Project if it works well for their communities.
+
+---
+<br>
+
+#### 12.3.3 Ukrainian Content Creators & Community Organisers
+
+**Positive impact**
+
+- Gain a platform that:
+  - explicitly supports Ukrainian language and context,
+  - lets them highlight Ukrainian-localised or Ukrainian-origin games,
+  - respects catalogue policies around Russian-linked content.
+- Can create **Ukrainian-focused sets and albums** and see them treated as first-class content.
+
+**Changes & responsibilities**
+
+- Need to:
+  - use and promote localisation/origin filters in their materials,
+- May be asked for feedback on how well the platform meets Ukrainian players’ expectations, influencing the roadmap.
+
+---
+<br>
+
+### 12.4 Impact on Platform Admins & Product Team
+
+**Positive impact**
+
+- Get a **clear business structure**:
+  - stakeholder groups, processes, data model, rules and policies.
+- Have access to:
+  - structured analytics on what users actually do (which games, sets, albums matter),
+  - moderations tools that form a traceable workflow rather than ad hoc actions.
+- Can make more grounded decisions about:
+  - which integrations are worth maintaining,
+  - which catalogue areas deserve deeper curation,
+  - which features to extend beyond MVP.
+
+**Changes & responsibilities**
+
+- Take on ongoing **operational duties**:
+  - managing curator roles,
+  - reviewing reports and sensitive catalogue flags,
+  - ensuring policy consistency (especially around Russian-linked and Ukrainian content).
+- Need to maintain and evolve:
+  - documentation (policies, help content),
+  - internal playbooks (e.g. how to handle abuse, how to react if an external API disappears).
+
+Organisationally, this means the project is not “build once and forget”, but an ongoing **service** with continuous BA input and refinement.
+
+---
+<br>
+
+### 12.5 Impact on External Services & Integration Partners
+
+**Positive impact**
+
+- Their data (official achievements, retro sets, metadata) becomes part of a **richer narrative**:
+  - long-term progress representations,
+  - visual albums,
+  - curated fan structures.
+- This may:
+  - improve perceived value of their own platforms,
+  - channel more engaged users towards them.
+
+**Changes & responsibilities**
+
+- Need to:
+  - ensure that Dream Project’s use of their data remains compliant with terms,
+  - possibly handle occasional support or communication about API changes.
+- May need to react if:
+  - Dream Project reveals edge cases or inconsistencies in their APIs or data.
+
+Dream Project, in turn, must be ready to **adjust quickly** if any partner tightens rules or changes API behaviour.
+
+---
+<br>
+
+### 12.6 Organisational Impact & Ways of Working
+
+Internally, adopting Dream Project as a real product (even if initially built for a portfolio) implies:
+
+- A more **structured BA practice**:
+  - clear separation between business case, BA document, SRS, and visual artefacts,
+  - traceability from stakeholder needs and gaps through to data and rules.
+- A **product mindset**:
+  - continuous iteration based on user behaviour,
+  - decisions grounded in actual usage and feedback rather than assumptions alone.
+- A lightweight but real **operational model**:
+  - defined responsibilities for catalogue maintenance, moderation, curator management,
+  - simple escalation paths when something goes wrong (abuse, data issues, integration failures).
+
+From a business analysis perspective, this section acts as a reminder that Dream Project is not just a set of features, but a **change in how different groups work and interact** around gaming progress.
+
+---
+<br>
+<br>
+
+## 13. Glossary & Definitions
+
+This glossary explains how key terms are used **within Dream Project** and this Business Analysis Document.  
+Where a term has a common industry meaning and a specific Dream Project meaning, the definition below refers to the **Dream Project** usage.
+
+---
+<br>
+
+### 13.1 Core Product Terms
+
+- **Dream Project**  
+  The web-based platform described in this documentation. It acts as a companion layer around games, focused on saves, achievements, and screenshot-based sticker albums.
 
 - **MVP (Minimum Viable Product)**  
-  The first fully working version of Dream Project, including the core features: save management, achievement tracking, and sticker albums.
+  The first usable version of Dream Project that delivers the three core pillars (save sharing, achievement tracking, sticker albums) in a limited but coherent scope.
 
-- **Metadata**  
-  The “data about data” for your saves and achievements—details like game title, platform, version, playtime, and chapter.
+- **AS-IS**  
+  The current state of the world without Dream Project: how players currently manage saves, achievements, and screenshots using existing tools.
 
-- **AI Validation**  
-  An automated check that uses machine learning or image recognition to make sure your uploaded screenshots match the curator’s template.
+- **TO-BE**  
+  The desired future state once Dream Project exists: how players will ideally interact with saves, achievements, and albums through the platform.
 
-- **API (Application Programming Interface)**  
-  A set of RESTful endpoints that allow external applications and services to interact with Dream Project’s core modules.
+---
+<br>
 
-- **WCAG (Web Content Accessibility Guidelines)**  
-  The rulebook for making our platform accessible to everyone, including people with disabilities (we follow WCAG 2.1 AA standards).
+### 13.2 Catalogue & Game Terms
+
+- **Game**  
+  A distinct title as understood by players (e.g. *Final Fantasy X*, *Silent Hill 2*). In the model, a Game groups all platform-specific variants and related content.
+
+- **Platform Variant**  
+  A specific combination of game and platform or edition (e.g. *FFX – PS2*, *FFX – PS4 Remaster*, *Hollow Knight – PC*). Important for save compatibility and platform-specific metadata.
+
+- **Catalogue**  
+  The structured list of Games and Platform Variants known to Dream Project, including tags, localisation info, and policy flags.
+
+- **Catalogue Tag**  
+  A reusable label applied to catalogue items (e.g. “JRPG”, “retro”, “Ukrainian localisation”). Some tags are purely descriptive; others have policy implications.
+
+- **Localisation Metadata**  
+  Information about which languages a game supports (including whether Ukrainian is officially supported).
+
+- **Origin Metadata**  
+  Information about where a game comes from (e.g. developer country, publisher country, “Ukrainian-origin game”, “Russian-linked publisher”).
+
+---
+<br>
+
+### 13.3 User, Role & Account Terms
+
+- **User Account**  
+  The authenticated identity of a person using Dream Project (credentials, settings, status).
+
+- **User Profile**  
+  The public-facing part of a user’s presence on the platform: nickname, avatar, visibility settings, high-level stats and badges.
+
+- **Regular User**  
+  Default role assigned at registration. Can browse content, upload their own saves/screenshots, track achievements, use albums, and report content.
+
+- **Curator**  
+  A user with additional permissions to create and maintain fan-made achievement sets and sticker album templates, and to propose certain catalogue improvements.
+
+- **Platform Administrator (Admin)**  
+  A user with elevated permissions to manage roles, moderation, and catalogue policies, including sensitive metadata (e.g. Russian-linked flags).
+
+- **Role Assignment**  
+  The relationship between a User Account and a role (Regular User, Curator, Admin), including when that role became active.
+
+- **External Profile Link**  
+  A secure internal link between a Dream Project account and an external service account (e.g. Steam, RetroAchievements), used for read-only progress synchronisation. External IDs are not shown to other users.
+
+---
+<br>
+
+### 13.4 Progress, Saves & Evidence Terms
+
+- **Save / Save File**  
+  A game’s internal representation of progress, typically stored as files, memory card images, or emulator states.
+
+- **Save Entry**  
+  Dream Project’s representation of an uploaded save, with metadata such as game, platform variant, description, and visibility (private/shared).
+
+- **Screenshot / Media Asset**  
+  An image uploaded by a user, usually a game screenshot. It can be used in sticker albums or as evidence for achievements.
+
+- **Achievement (General)**  
+  A discrete goal or condition associated with a game (e.g. “Defeat Boss X”, “Collect all items in area Y”).
+
+- **Official Achievement**  
+  An achievement defined and managed by a game platform or developer (e.g. Steam achievements, console trophies).
+
+- **Fan-Made Achievement / Challenge**  
+  A custom goal defined by the community (curators), not part of the official platform list, usually grouped into a fan-made set.
+
+- **Achievement Set**  
+  A structured group of achievements or challenges for a given game (and optionally platform). Can be official, external retro, or Dream Project–native fan-made.
+
+- **Achievement Item**  
+  A single achievement or challenge inside an Achievement Set, with its own name, condition, and optional hints.
+
+- **Retro / External Achievement Set**  
+  An Achievement Set imported from an external retro service (e.g. RetroAchievements) and synchronised read-only from the linked external profile.
+
+- **Completion Record**  
+  A record representing a user’s progress on a specific Achievement Item (e.g. not started/in progress/completed, timestamps, source of completion).
+
+- **Evidence Link**  
+  A link between a Completion Record and supporting evidence (e.g. screenshot, save entry, external clip URL).
+
+---
+<br>
+
+### 13.5 Sticker Albums & Visual Progress Terms
+
+- **Sticker Album (Concept)**  
+  A conceptual visual collection where each “sticker” corresponds to a specific game moment (boss, area, ending, etc.), filled by screenshots.
+
+- **Sticker Album Template**  
+  A curated design for an album for a specific game (and optionally platform), defined by a curator. It describes which stickers/slots exist and what they represent.
+
+- **Sticker Slot Definition**  
+  A single slot in a Sticker Album Template, with a hint and detailed description of what the screenshot should show (e.g. a particular boss or scene).
+
+- **Sticker Album Instance**  
+  One user’s personal copy of an album template, showing which slots they have filled, completion status, and timestamps.
+
+- **Sticker Slot Fill**  
+  A user’s screenshot filling a particular slot in their album instance, including its validation state (accepted, flagged, under review).
+
+- **First Playthrough Friendly Album**  
+  An album template type aimed at new players; slot descriptions are written with minimal spoilers and more subtle hints.
+
+- **Post-Completion / Deep Dive Album**  
+  An album template type aimed at players who already finished the game; descriptions can be explicit and spoiler-heavy.
+
+---
+<br>
+
+### 13.6 Governance, Policy & Integration Terms
+
+- **Content Report**  
+  A user-submitted report flagging a save, screenshot, achievement item/set, album template, comment, or profile as problematic (corrupt, misleading, offensive, etc.).
+
+- **Moderation Decision**  
+  An admin action taken in response to reports or proactive checks (e.g. keep, edit metadata, hide, delete, warn or restrict user).
+
+- **Catalogue Policy Flag**  
+  A specific metadata flag with policy implications (e.g. “Russian-linked publisher”, “Ukrainian-origin game”, “contains Ukrainian localisation”).
+
+- **Russian-Linked Content**  
+  Content (usually games) that is associated with Russian developers or publishers according to catalogue policy. Handling and visibility may depend on user locale and settings.
+
+- **Ukrainian-Origin Game**  
+  A game that is developed by a Ukrainian studio or strongly associated with Ukraine, used for highlighting and filtering.
+
+- **GDPR-Like Expectations**  
+  A shorthand for privacy and data-protection obligations similar to GDPR (clear consent, minimal data, right to access/delete where feasible).
+
+---
+<br>
+
+### 13.7 BA & Documentation Terms (Context)
+
+- **Business Case**  
+  The document that explains why Dream Project is worth doing at all: objectives, value, high-level scope, risks, and rough effort/cost.
+
+- **Business Analysis Document (this document)**  
+  The analysis-focused document that connects business needs, AS-IS/TO-BE, processes, rules, and data into a coherent model for requirements.
+
+- **SRS (System Requirements Specification)**  
+  A more technical document (not this one) that will translate business analysis into detailed functional and non-functional requirements for implementation.
+
+- **Business Rule**  
+  A constraint or policy that must always hold true in the system (e.g. “external achievements are read-only”, “only admins can approve Russian-linked flags”).
+
+- **Non-Functional Considerations / Non-Functional Requirements**  
+  Qualities of the system that are not about specific features but about how it behaves (e.g. performance, security, reliability, usability).
+
+This glossary is intended as a living reference; if new recurring terms appear in future artefacts, they should be added here to keep communication clear for all stakeholders.
+
+---
+<br>
+<br>
