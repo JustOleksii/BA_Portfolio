@@ -1,4 +1,4 @@
-# Business Analysis Document – Dream Project
+# Business Analysis Document
 
 ## Document Structure
 
