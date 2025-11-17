@@ -4375,3 +4375,1119 @@ Every requirement in 4.1–4.9 will follow a consistent shape so engineers, QA, 
 ---
 <br>
 <br>
+
+## 5. External Interface Requirements
+
+> This section defines the interfaces visible outside the core: the **web UI**, our **public read APIs**, third-party provider integrations (Steam, RetroAchievements, IGDB, storage/CDN, email, vision moderation), **inbound webhooks**, and **import/export formats**.
+
+---
+<br>
+
+### 5.0 How to Read This Section
+- **Direction** — Outbound (we call a provider) / Inbound (provider calls us) / End-user (browser/UI) / Policy (rules layer).
+- **Auth** — Mechanism & scopes (e.g., OAuth, API key, session).
+- **Protocol** — Transport, formats, versioning, security.
+- **Contracts** — Minimal request/response shapes, fields, states.
+- **Limits** — File sizes, quotas, timeouts, rates.
+- **Failure Modes** — Degrade/rollback behaviors on errors.
+- **Privacy** — PII boundaries, visibility, retention.
+
+> Cross-cutting: The **version-compatibility layer** (Steam build/manifest IDs; retro region/emulator facets; statuses `confirmed | untested | legacy | incompatible`; community confirmations; Admin overrides) is fed by adapters and surfaced in UI & API.
+
+---
+<br>
+
+### 5.1 End-User Web UI (Browser)
+
+**Direction:** End-user  
+**Auth:** Session cookie; CSRF token on writes; OAuth only during external account linking.  
+**Protocol:** HTTPS (TLS 1.2+), HSTS, HTTP/2; JSON over REST/XHR; images via CDN.
+
+**Contracts:**  
+- **Browsers:** Latest Chrome/Firefox/Edge/Safari (n–1).  
+- **i18n:** `Accept-Language` or profile → **EN/UA** strings; locale formats for dates/numbers.  
+- **Accessibility:** WCAG 2.1 AA; keyboardable tabs/dialogs/galleries; alt text for avatars/badges.  
+- **Uploads:**  
+  - Saves ≤ **200 MB** (configurable), native save extensions or `.zip`; AV scan; checksum.  
+  - Screenshots ≤ **15 MB** (`png | jpeg | webp`); EXIF stripped server-side.  
+  - Evidence = links only (allowlist), no video uploads.  
+- **Downloads:** Saves served with SHA-256 checksum header + compatibility chips (build/region/status).  
+- **Spoilers:** Heavy spoilers collapsed; explicit reveal; screen-reader friendly.
+
+**Limits:** Front-end enforces caps; back-end authoritative.  
+**Failure Modes:** Clear toasts/banners; retry hints; no stack traces.  
+**Privacy:** No external IDs shown unless owner enables read-only panels; no third-party scripts on secure views.
+
+---
+<br>
+
+### 5.2 Public REST API (Read-Only, MVP)
+
+**Direction:** Inbound  
+**Auth:** API key (server-to-server) or none for strictly public endpoints; per-key rate limits.  
+**Protocol:** HTTPS JSON; versioned base path **`/api/v1`**; ETag/Last-Modified; CORS allowlist.
+
+**Contracts (representative):**  
+- `GET /api/v1/search/{vertical}` where vertical ∈ `games | saves | achievements | albums | users`  
+  - Query: `q`, facets (`platform`, `build`, `status`, `type`, `locale`, …), `page`, `per_page`, `sort`  
+  - Response: `{ items: [...], facets: {...}, page, per_page, next_cursor? }`  
+- `GET /api/v1/games/{id}` — game + variants + pillar availability.  
+- `GET /api/v1/achievements/sets/{id}` — set metadata (official/retro/fan), aggregates (no private progress).  
+- `GET /api/v1/albums/templates/{id}` — template + slot descriptors (spoiler-aware), completion stats.  
+- `GET /api/v1/saves/{id}` — save metadata (build/region/status), uploader nickname if public, download URL (signed if needed).
+
+**Limits:** Default **60 req/min** per key; typical payload ≤ **1 MB**; pagination cap via cursoring.  
+**Failure Modes:**  
+
+    {
+      "error": {
+        "code": "rate_limited | not_found | forbidden | invalid_query | server_error",
+        "message": "human-readable",
+        "correlation_id": "uuid"
+      }
+    }
+
+**Privacy:** Honors visibility; no emails/external IDs; link-only resources require signed URLs.
+
+---
+<br>
+
+### 5.3 IGDB Metadata Adapter
+
+**Direction:** Outbound  
+**Auth:** Provider key in secrets vault.  
+**Protocol:** HTTPS JSON; scheduled pulls (nightly); backoff on errors.
+
+**Contracts:** Sync **games**, **platforms**, **genres**, **release dates**, **alt titles**, **covers** → `Game`, `Variant`, `AltTitle`, `Images`.  
+**Limits:** Respect quotas; batch pagination.  
+**Failure Modes:** Outage/schema drift → skip cycle, log; UI shows “metadata last updated …”.  
+**Privacy:** No user data sent; attribution badge “Metadata: IGDB”.
+
+---
+<br>
+
+### 5.4 Steam — OAuth Linking & Official Achievements
+
+**Direction:** Outbound + End-user OAuth  
+**Auth:** User OAuth; minimal scopes; unlink anytime.  
+**Protocol:** HTTPS JSON; scheduled per user/app sync.
+
+**Contracts:**  
+- Link flow stores token ref + user visibility.  
+- Sync app schema & user achievement states → `AchSet(type=official)`, `AchProgress`.  
+- **Build/Manifest** signals ingested where available (else manual/community entry).
+
+**Limits:** Provider rate limits; staggered 12–24h syncs; manual “Sync now” with cooldown.  
+**Failure Modes:** Private profile/outage → mark **stale**; never block fan features.  
+**Privacy:** Steam ID never shown unless owner enables panel; no write-back; no anti-cheat-sensitive behavior.
+
+---
+<br>
+
+### 5.5 RetroAchievements — Linking & Sets
+
+**Direction:** Outbound  
+**Auth:** RA username/API key; unlink anytime.  
+**Protocol:** HTTPS JSON; scheduled syncs.
+
+**Contracts:** Import **sets** & **user progress** for mapped titles → `AchSet(type=retro)`, `AchItem`, `AchProgress` (read-only).  
+**Limits:** Respect RA quotas.  
+**Failure Modes:** API down → keep last good state; mark stale.  
+**Privacy:** Panel optional/hidden by default; no write-back.
+
+---
+<br>
+
+### 5.6 Evidence Links (YouTube, GameFAQs, etc.)
+
+**Direction:** Outbound (server-side metadata fetch)  
+**Auth:** None (public pages).  
+**Protocol:** HTTPS; **allowlist** enforced; HEAD/GET with tight caps.
+
+**Contracts:** Store `{ url, provider, title?, thumbnail_url?, meta_expires_at }` with TTL.  
+**Limits:** Metadata timeouts ≤ **2s**; size caps; reject non-allowlisted.  
+**Failure Modes:** Unreachable/blocked → user-facing guidance to retry or pick allowed host.  
+**Privacy:** No client-side third-party calls in secure views.
+
+---
+<br>
+
+### 5.7 Storage, CDN & Antivirus
+
+**Direction:** Outbound to S3-compatible storage & CDN  
+**Auth:** Access keys in vault; signed URLs for private/link-only.  
+**Protocol:** HTTPS; multipart uploads; server-side encryption (KMS).
+
+**Contracts:**  
+- **Saves:** binary/blob or zip; DB sidecar with `game_id`, `variant`, **build**, **compat_status**, checksum.  
+- **Screenshots:** original + derivatives; EXIF stripped; CDN cached.  
+- **Quarantine:** separate bucket/prefix for suspicious files.
+
+**Limits:** Saves ≤ **200 MB**; screenshots ≤ **15 MB**.  
+**Failure Modes:** AV down → block uploads; image processor down → serve originals (size-capped).  
+**Privacy:** Signed URLs; non-guessable keys; logs omit full private URLs.
+
+---
+<br>
+
+### 5.8 Transactional Email Provider
+
+**Direction:** Outbound  
+**Auth:** API key; DKIM/SPF.  
+**Protocol:** HTTPS JSON.
+
+**Contracts:** UA/EN templates for verification, reset, moderation, appeals, notifications.  
+**Limits:** Provider quotas; retries with backoff.  
+**Failure Modes:** Persistent failure → in-app only fallback.  
+**Privacy:** Minimal PII; unsubscribe only for non-essential emails.
+
+---
+<br>
+
+### 5.9 Vision Moderation (Screenshots)
+
+**Direction:** Outbound  
+**Auth:** API key or internal service account.  
+**Protocol:** HTTPS JSON (or internal RPC).
+
+**Contracts:** Input = thumbnail; Output = labels `nsfw | off_topic | mismatch` + scores for **triage only**.  
+**Limits:** Size/time cap; throttle; batch where possible.  
+**Failure Modes:** Model down → route to human queue.  
+**Privacy:** No training on user content without explicit consent; store decisions, not images.
+
+---
+<br>
+
+### 5.10 Inbound Webhooks (Framework)
+
+**Direction:** Inbound  
+**Auth:** HMAC signature + IP allowlist; idempotency keys.  
+**Protocol:** HTTPS JSON `POST /webhooks/{provider}`.
+
+**Contracts:** Envelope `{ event_type, occurred_at, payload }`; provider-specific mapping done in adapters.  
+**Limits:** **2s** processing budget → enqueue job; reply 200 on accept.  
+**Failure Modes:** Bad sig/IP → 401/403; retries handled by provider or via our backfills.  
+**Privacy:** Payloads redacted in logs; correlation IDs only.
+
+---
+<br>
+
+### 5.11 Import / Export Formats
+
+**Direction:** End-user (browser) & Public API (download)  
+**Auth:** Session/API key; visibility enforced.  
+**Protocol:** HTTPS; binary streams; optional JSON sidecars.
+
+**Contracts:**  
+- **Saves (import):** native save extensions or `.zip`; required metadata: `{ game, variant/platform, build? (modern), region/emulator? (retro), short_description }`; AV scan; checksum; initial compat = `untested`.  
+- **Saves (export):** original file; optional JSON sidecar `{ game_id, variant_id, builds_tested: [], region, status, sha256 }`.  
+- **Screenshots:** accept `png | jpeg | webp`; originals + derivatives; no EXIF; optional alt text.  
+- **Evidence links:** allowlist domains; stored minimal metadata; purge when removed upstream.
+
+**Limits:** Size caps as per **5.1 / 5.7**; rate-limits on repeated uploads.  
+**Failure Modes:** Invalid format → descriptive error; quarantine on AV suspicion.  
+**Privacy:** Respect visibility; signed URLs for non-public assets.
+
+---
+<br>
+
+### 5.12 Error & Status Semantics (External)
+
+**Direction:** Policy  
+**Auth:** N/A  
+**Protocol:** HTTP status + JSON body.
+
+**Contracts:**  
+- Success: **200/206** with ETag; **304** on cache hit.  
+- Client errors: **400** (invalid query), **401/403** (auth/forbidden), **404** (not found or private), **409** (conflict/idempotency), **429** (rate-limited).  
+- Server/provider: **5xx**.  
+- Body includes `"correlation_id"` for support.
+
+**Limits:** Error payloads ≤ **2 KB**.  
+**Failure Modes:** On upstream outage, return cached/stale with banner where applicable.  
+**Privacy:** Do not reveal existence of private resources; neutral error wording.
+
+---
+<br>
+
+### 5.13 Security & Privacy at Interface Boundaries
+
+**Direction:** Policy  
+**Auth:** Session/OAuth/API keys; rotation for secrets.  
+**Protocol:** TLS everywhere; HSTS; modern ciphers; strict **CORS** (no wildcard on credentials); **CSRF** on state-changing browser calls.
+
+**Contracts:** Security headers (CSP, X-Frame-Options, Referrer-Policy).  
+**Limits:** WAF + rate limits on public endpoints.  
+**Failure Modes:** On anomaly spikes, degrade to stricter rate caps; preserve core read paths.  
+**Privacy:** PII minimisation; no emails/external IDs in public API; unlink/delete purges cached external data, aggregates stay anonymised.
+
+---
+<br>
+
+### 5.14 Localisation & UA/Russia Policy Surfacing (Interface Rules)
+
+**Direction:** Policy  
+**Auth:** N/A  
+**Protocol:** Locale negotiation via header/profile.
+
+**Contracts:**  
+- **Locales:** EN/UA across UI & public API strings.  
+- **Policy surfacing:** UA/Russia flags appear in **Catalogue/Discovery** only (not on profiles), per locale and user toggle.  
+- **Toggle:** “Hide Russia-linked” adds a discovery filter; default follows UA locale, optional for EN.
+
+**Limits:** None beyond normal search/filter constraints.  
+**Failure Modes:** Missing translations → EN fallback with marker for internal QA.  
+**Privacy:** Policy flags are metadata on games/variants, not on users; no geofencing or PII inference.
+
+---
+<br>
+<br>
+
+## 6. Non-Functional Requirements — System View
+
+> This section defines measurable, testable **system qualities** that apply across modules (Accounts §4.1, Catalogue §4.2, Saves §4.3, Achievements §4.4, Albums §4.5, Profiles §4.6, Moderation §4.7, Discovery §4.8, Integrations §4.9) and across the external interfaces (§5).  
+> **ID scheme:** `NFR-<DOMAIN>-NN` (e.g., `NFR-PERF-01`). Each item lists **Statement**, **Rationale**, **Verification**, and **Applies to**.
+
+---
+<br>
+
+### 6.0 Reading Guide & Scope
+- **Statement** — precise, measurable requirement.  
+- **Rationale** — why this matters for Dream Project.  
+- **Verification** — how we’ll test/measure it (envs, tools, metrics).  
+- **Applies to** — modules/interfaces most affected.  
+Cross-cutting: the **version-compatibility layer** (Steam *build/manifest IDs*, retro *region/emulator* facets, statuses `confirmed/untested/legacy/incompatible`) is in scope for performance, consistency and UX guarantees below.
+
+---
+<br>
+
+### 6.1 Performance & Capacity (`NFR-PERF-*`)
+
+#### NFR-PERF-01 — API Read Latency
+- **Statement:** For **public read** endpoints (games, search, sets, albums, saves, profiles), **p95 ≤ 600 ms** and **p99 ≤ 1,200 ms** under normal load.
+- **Rationale:** Keeps discovery and browsing snappy.
+- **Verification:** Synthetic probes + prod APM; load tests at projected RPS.
+- **Applies to:** §4.8 Discovery, §5.2 API, game/variant pages.
+
+#### NFR-PERF-02 — Page Performance Budgets
+- **Statement:** Landing/game/search pages meet **LCP ≤ 2.5 s (p75)**, **CLS ≤ 0.1**, **TTI ≤ 3 s** on mid-range mobile over 4G.
+- **Rationale:** Web UX expectations; improves engagement.
+- **Verification:** Lighthouse CI, Web Vitals RUM.
+- **Applies to:** Web UI (§5.1), Discovery (§4.8).
+
+#### NFR-PERF-03 — Search & Typeahead
+- **Statement:** **Typeahead ≤ 150 ms (p95)**; full **search ≤ 700 ms (p95)** with facets; **index propagation ≤ 5 min** after content/visibility changes.
+- **Rationale:** Instant feedback and near-real-time freshness.
+- **Verification:** APM timers; index lag monitors; CI timings.
+- **Applies to:** §4.8, §5.2.
+
+#### NFR-PERF-04 — Upload/Download Throughput
+- **Statement:** Support **200 MB** save uploads with **resumable** flows; maintain **≥ 5 parallel uploads** per user without degraded UX; downloads start within **≤ 400 ms TTFB** (cached).
+- **Rationale:** Saves are large and critical; interruptions happen.
+- **Verification:** Controlled network sims, CDN logs, S3 metrics.
+- **Applies to:** §4.3 Saves, §5.7 Storage/CDN, §5.1 Web.
+
+#### NFR-PERF-05 — Background Jobs Freshness
+- **Statement:** External sync (Steam/RA) staleness **≤ 24 h**; visibility/moderation changes reflected in listings **≤ 3 min**.
+- **Rationale:** Trustworthy data & moderation outcomes.
+- **Verification:** Job lag dashboards; change-feed SLOs.
+- **Applies to:** §4.4, §4.7, §4.8, §4.9.
+
+---
+<br>
+
+### 6.2 Availability & Reliability (`NFR-AVL-*`)
+
+#### NFR-AVL-01 — Service Availability (MVP)
+- **Statement:** Monthly **availability ≥ 99.5%** for read paths; write paths **≥ 99.0%**.
+- **Rationale:** Reasonable target for an MVP with few operators.
+- **Verification:** External uptime monitors; SLO reports.
+- **Applies to:** All web/API (§5.1–5.2).
+
+#### NFR-AVL-02 — Graceful Degradation
+- **Statement:** On adapter outages (Steam/RA/IGDB), the UI **degrades** with “stale data” banners; fan features stay usable.
+- **Rationale:** Keep core value available even when providers fail.
+- **Verification:** Chaos tests; feature flags; manual drills.
+- **Applies to:** §4.4, §4.9, §5.4–5.5.
+
+#### NFR-AVL-03 — Data Durability (Objects)
+- **Statement:** User saves/screenshots stored on **redundant object storage** with **lifecycle policies** and integrity checks (checksums).
+- **Rationale:** Content loss is unacceptable.
+- **Verification:** Periodic checksum audits; restore tests.
+- **Applies to:** §5.7 Storage/CDN.
+
+#### NFR-AVL-04 — Idempotency & Retries
+- **Statement:** Webhooks and external calls are **idempotent**; retries use **exponential backoff** with jitter.
+- **Rationale:** Prevent duplicates and thundering herds.
+- **Verification:** Contract tests; failure injection.
+- **Applies to:** §5.10, §4.9.
+
+---
+<br>
+
+### 6.3 Security & Privacy (`NFR-SEC-*`)
+
+#### NFR-SEC-01 — Transport Security
+- **Statement:** **TLS 1.2+**, **HSTS**, modern ciphers; no plaintext endpoints.
+- **Rationale:** Baseline confidentiality/integrity.
+- **Verification:** SSL scans; CSP/HSTS checks.
+- **Applies to:** All external (§5).
+
+#### NFR-SEC-02 — Encryption at Rest
+- **Statement:** DB and object storage encrypted with **KMS-managed keys**; secrets never stored in code; **vault** for credentials.
+- **Rationale:** Reduce blast radius if storage is compromised.
+- **Verification:** Config audits; key rotation logs.
+- **Applies to:** §5.7, adapters §4.9.
+
+#### NFR-SEC-03 — Secrets Hygiene
+- **Statement:** API keys/tokens rotated **≤ 90 days**; access is least-privilege; never logged; short-lived env injection.
+- **Rationale:** Mitigate key leakage risks.
+- **Verification:** Vault audit trails; CI checks for secret leaks.
+- **Applies to:** §4.9, §5.4–5.5.
+
+#### NFR-SEC-04 — AppSec Baseline
+- **Statement:** Meet **OWASP ASVS L2** intent for inputs, auth, session, CSRF; **file AV scan mandatory** for uploads.
+- **Rationale:** Common web threats, plus risky files.
+- **Verification:** SAST/DAST; pen-tests; AV quarantine metrics.
+- **Applies to:** §5.1, §5.7, §4.3, §4.5.
+
+#### NFR-SEC-05 — Access Control & Audit
+- **Statement:** RBAC for Admin/Curator/Moderator; **immutable audit logs** for moderation and admin actions with **≥ 12 months** retention.
+- **Rationale:** Accountability and forensics.
+- **Verification:** Audit log immutability checks; role tests.
+- **Applies to:** §4.7 Moderation, Admin tools.
+
+#### NFR-SEC-06 — Rate Limits & WAF
+- **Statement:** Public endpoints protected by **IP/user rate limits** and **WAF** rules; upload/report/contact forms bot-hardened.
+- **Rationale:** Abuse and DDoS mitigation.
+- **Verification:** Load/abuse tests; WAF dashboards.
+- **Applies to:** §5.1–5.2.
+
+#### NFR-SEC-07 — PII Minimisation & RTBF
+- **Statement:** Store **minimal PII**; never expose emails/external IDs publicly; on **unlink/delete**, purge cached external data within **30 days** (aggregates remain anonymised).
+- **Rationale:** Privacy by design.
+- **Verification:** Data flow reviews; deletion job reports.
+- **Applies to:** §4.1, §4.6, §4.9, §5.13.
+
+---
+<br>
+
+### 6.4 Compliance & Legal (`NFR-LAW-*`)
+
+#### NFR-LAW-01 — Takedown Process
+- **Statement:** **DMCA/copyright** flow with temporary disable-on-claim, counter-notice path, and **legal hold** for evidence.
+- **Rationale:** Lawful handling of UGC/IP claims.
+- **Verification:** Case audits; SLA timers.
+- **Applies to:** §4.7, §5.12.
+
+#### NFR-LAW-02 — Data Subject Rights
+- **Statement:** Provide **export** and **deletion** capabilities for user data within **30 days** of request; document limits for third-party platforms.
+- **Rationale:** GDPR-style expectations.
+- **Verification:** Ticket → completion tracking; spot tests.
+- **Applies to:** §5.13, §4.9.
+
+---
+<br>
+
+### 6.5 Localisation & Internationalisation (`NFR-LOC-*`)
+
+#### NFR-LOC-01 — Language Coverage
+- **Statement:** Full **EN/UA** coverage for UI, emails, error messages; **EN fallback** where strings are missing (flagged for fix).
+- **Rationale:** Two primary audiences.
+- **Verification:** i18n lint; translation completeness reports.
+- **Applies to:** §5.1, §5.8.
+
+#### NFR-LOC-02 — Locale Behaviour
+- **Statement:** Dates/numbers/timezones respect user locale; search supports UA/EN **transliteration** and **alt titles**.
+- **Rationale:** Make finding content natural.
+- **Verification:** Search tests; formatting snapshots.
+- **Applies to:** §4.8, §5.2.
+
+#### NFR-LOC-03 — UA/Russia Policy Exposure
+- **Statement:** UA/Russia flags appear **only** in Catalogue/Discovery with user toggle; **never** on profiles.
+- **Rationale:** Policy clarity without user doxxing.
+- **Verification:** UI snapshot tests; queries with toggle on/off.
+- **Applies to:** §4.2, §4.8, §5.14.
+
+---
+<br>
+
+### 6.6 Accessibility & UX Quality (`NFR-UX-*`)
+
+#### NFR-UX-01 — WCAG Target
+- **Statement:** Meet **WCAG 2.1 AA** for navigation, contrast, alt text, focus states.
+- **Rationale:** Inclusive design baseline.
+- **Verification:** Axe CI, manual screen-reader passes.
+- **Applies to:** §5.1.
+
+#### NFR-UX-02 — Spoiler Safety
+- **Statement:** Spoiler-marked content is **collapsed by default**, with accessible “reveal” control.
+- **Rationale:** Protects player experience.
+- **Verification:** UI tests; a11y tree checks.
+- **Applies to:** §4.4, §4.5, §4.6.
+
+#### NFR-UX-03 — Error Messaging
+- **Statement:** Errors are **plain-language**, localised, with actionable next steps; no stack traces to users.
+- **Rationale:** Trust and clarity.
+- **Verification:** Copy reviews; UX snapshots.
+- **Applies to:** All UI.
+
+#### NFR-UX-04 — Mobile Responsiveness
+- **Statement:** Core flows (search, view game, upload, view profile) work on **≤ 360 px** width devices.
+- **Rationale:** Real-world usage on phones.
+- **Verification:** Responsive snapshots; device lab tests.
+- **Applies to:** §5.1.
+
+#### NFR-UX-05 — Progress & Feedback
+- **Statement:** Long operations (uploads, scans, sync) show **visible progress** and **completion toasts**.
+- **Rationale:** Reduce abandonment and duplicates.
+- **Verification:** UI integration tests.
+- **Applies to:** §4.3, §4.5, §4.9.
+
+---
+<br>
+
+### 6.7 Observability & Operations (`NFR-OBS-*`)
+
+#### NFR-OBS-01 — Structured Logging
+- **Statement:** All requests/jobs emit structured logs with **correlation IDs**; PII redacted by default.
+- **Rationale:** Debugging without leaking data.
+- **Verification:** Log samples; redaction tests.
+- **Applies to:** All services.
+
+#### NFR-OBS-02 — Metrics & SLOs
+- **Statement:** Track **latency, error rate, index lag, quota use, staleness**; publish **SLO dashboards** for PERF/AVL targets.
+- **Rationale:** Run the system by numbers.
+- **Verification:** Grafana/New Relic dashboards; alert tests.
+- **Applies to:** §6.1–6.2, §4.9.
+
+#### NFR-OBS-03 — Tracing
+- **Statement:** Distributed tracing on **read & write critical paths** with **≥ 10% sampling**.
+- **Rationale:** Pinpoint slow or failing spans.
+- **Verification:** Trace store sampling audits.
+- **Applies to:** API, jobs, adapters.
+
+#### NFR-OBS-04 — Alerting Hygiene
+- **Statement:** Actionable alerts with runbooks; **no alert** without an assigned owner; paging only for SLO/SLA breaches.
+- **Rationale:** Keep on-call sane.
+- **Verification:** Runbook links; alert reviews.
+- **Applies to:** Ops.
+
+---
+<br>
+
+### 6.8 Scalability & Maintainability (`NFR-SCL-*`, `NFR-MNT-*`)
+
+#### NFR-SCL-01 — Horizontal Scale
+- **Statement:** Stateless API tier scales to **baseline 100 RPS sustained** with 2× headroom; sessions externalised.
+- **Rationale:** Predictable growth path.
+- **Verification:** Load tests; auto-scale drills.
+- **Applies to:** API, Web.
+
+#### NFR-SCL-02 — Search Index Capacity
+- **Statement:** Support **≥ 1M** games/variants and **≥ 10M** saves/screenshots indexed with facet counts within **≤ 1 s** render budget.
+- **Rationale:** Room for community growth.
+- **Verification:** Index sizing tests; facet timing probes.
+- **Applies to:** §4.8.
+
+#### NFR-MNT-01 — Code Health
+- **Statement:** CI with lint/type checks; **unit test coverage ≥ 70%** on core logic; contracts verified for adapters.
+- **Rationale:** Confidence to change.
+- **Verification:** CI gates; coverage reports.
+- **Applies to:** All repos.
+
+#### NFR-MNT-02 — API Versioning
+- **Statement:** Public API versioned (`/api/v1`); **deprecation window ≥ 90 days** with docs.
+- **Rationale:** Safe evolution for clients.
+- **Verification:** Docs; deprecation headers.
+- **Applies to:** §5.2.
+
+---
+<br>
+
+### 6.9 Backup, DR & Retention (`NFR-DR-*`, `NFR-RET-*`)
+
+#### NFR-DR-01 — Backups & Restore
+- **Statement:** Daily DB backups; **RPO ≤ 24 h**, **RTO ≤ 24 h** (MVP); quarterly restore drills.
+- **Rationale:** Recover from bad days.
+- **Verification:** Restore runbooks; drill reports.
+- **Applies to:** DB, metadata stores.
+
+#### NFR-RET-01 — Content Retention
+- **Statement:** Saves archived after **12 months** of inactivity (with notices) per business rules; moderation evidence kept **12 months** unless in legal hold.
+- **Rationale:** Storage cost & policy compliance.
+- **Verification:** Lifecycle rules; purge job logs.
+- **Applies to:** §4.3, §4.7.
+
+#### NFR-DR-02 — Region Strategy
+- **Statement:** Store user content in **EU region** by default; CDN edge delivery; document exceptions where providers lack EU regions.
+- **Rationale:** Latency & regional expectations.
+- **Verification:** Infra config audits.
+- **Applies to:** §4.9, §5.7, §5.13.
+
+---
+<br>
+
+### 6.10 Data Quality & Consistency (`NFR-DQ-*`)
+
+#### NFR-DQ-01 — Catalogue Integrity
+- **Statement:** Enforce unique game/variant keys; manage alt titles & synonyms; RA/Steam IDs mapped with provenance.
+- **Rationale:** Clean discovery & deduplication.
+- **Verification:** DB constraints; data lint jobs.
+- **Applies to:** §4.2, §4.9.
+
+#### NFR-DQ-02 — Compatibility Status Accuracy
+- **Statement:** Save **compatibility flips** (e.g., confirmed→legacy) require **evidence** (community threshold or moderator action) and propagate to search within **≤ 5 min**.
+- **Rationale:** Users rely on these badges.
+- **Verification:** Event→index timers; mod audit logs.
+- **Applies to:** §4.3, §4.7, §4.8.
+
+#### NFR-DQ-03 — Eventual Consistency Bounds
+- **Statement:** User-visible aggregates (counts, completion rates) converge within **≤ 10 min** of underlying events.
+- **Rationale:** Numbers must stabilise quickly.
+- **Verification:** Aggregation lag monitors.
+- **Applies to:** Profiles §4.6, Albums §4.5, Achievements §4.4.
+
+---
+<br>
+
+### 6.11 Interoperability & Adapter Contracts (`NFR-INT-*`)
+
+#### NFR-INT-01 — Timeouts & Circuit Breakers
+- **Statement:** External calls time out **≤ 2 s** (metadata) / **≤ 6 s** (bulk sync); breakers trip on error spikes, serving cached data.
+- **Rationale:** Keep UX responsive under failures.
+- **Verification:** Chaos tests; breaker dashboards.
+- **Applies to:** §4.9, §5.3–5.6.
+
+#### NFR-INT-02 — Stubs & Sandboxes
+- **Statement:** Every adapter ships **test stubs** with canned responses and error modes for CI.
+- **Rationale:** Deterministic tests; no provider coupling.
+- **Verification:** CI uses stubs by default.
+- **Applies to:** §4.9.
+
+---
+<br>
+
+### 6.12 Acceptance & Reporting
+
+- **System must publish** a quarterly **SLO report** (latency, availability, index lag, moderation SLAs) and a **transparency report** for moderation (§4.7).  
+- **NFR verification matrix** will map each `NFR-*` to the specific test/monitoring artifacts (Lighthouse runs, load test outputs, APM dashboards, backup drill logs).
+
+---
+<br>
+<br>
+
+## 7. Data & Storage Considerations
+
+> This section turns the information model (§2 & §4.x) into concrete **storage, indexing, lifecycle, and protection** decisions.  
+> **ID scheme for data requirements:** `DS-<AREA>-NN` to aid traceability (e.g., `DS-OBJ-03`). Where relevant, items link back to BRD (§7) and NFRs (§6).
+
+---
+<br>
+
+### 7.0 Scope & Reading Guide
+- **What’s covered:** relational schema boundaries, object storage for files, search index denormalisation, caching, lifecycle/retention, backups/DR, encryption & privacy, data residency, and data-quality rules.  
+- **What’s not:** detailed column types for *every* field (kept in the migration scripts/ERD in Visuals). Below we list the **authoritative tables** and **critical fields** needed to reason about behaviour.
+
+---
+<br>
+
+### 7.1 Storage Architecture at a Glance
+- **Primary DB:** Relational (e.g., PostgreSQL 15+) for core entities: Users, Roles, Games/Variants, Saves, Achievements, Albums, Moderation, Events.  
+- **Object Store:** S3-compatible for **saves** and **screenshots** (originals + derivatives), with **quarantine** prefix.  
+- **Search Index:** Denormalised read model (e.g., OpenSearch/Algolia) for **discovery** and **typeahead**.  
+- **Cache:** Redis (sessions, rate limits, short-lived query results, idempotency keys).  
+- **CDN:** For images/screenshots; signed URLs for private/link-only.  
+- **Analytics/Logs:** Structured logs with correlation IDs; aggregated metrics (non-PII).
+
+---
+<br>
+
+### 7.2 Core Relational Model (Authoritative Tables)
+
+> The following tables are the **source of truth**; indexes are indicated when performance-critical.
+
+- **users** *(id, email, password_hash, locale, created_at, deleted_at?)*  
+  - Indexes: `email unique`, `created_at`.  
+  - Visibility prefs kept in `user_settings(user_id, key, value_jsonb)`.
+
+- **roles** / **user_roles** *(user_id, role, since_at)*  
+  - Roles: `regular|curator|moderator|admin`.  
+  - Keeps **role change history** (`since_at`) rather than mutating in place.
+
+- **external_links** *(id, user_id, provider, token_ref, visibility, last_synced_at)*  
+  - Providers: `steam|ra`. Tokens encrypted; no plain external IDs if panel hidden.
+
+- **games** *(id, igdb_id?, title, ua_localised?, ua_developer?, ru_linked?, created_at)*  
+- **variants** *(id, game_id, platform, region?, ra_game_id?, steam_app_id?, build_manifest_catalog jsonb, first_seen_at)*  
+  - `build_manifest_catalog` stores known Steam build/manifest IDs + provenance.
+
+- **saves** *(id, variant_id, uploader_id, title, description, status, sha256, size_bytes, dlc_flags jsonb, created_at, soft_deleted_at?)*  
+  - **status** ∈ `confirmed|untested|legacy|incompatible`.  
+  - **compatibility** details live in **save_compat_tests** (see §7.3).  
+  - Indexes: `(variant_id, status)`, `created_at desc`, `sha256`.
+
+- **save_versions** *(save_id, vnum, object_key, created_at)* — optional if we expose internal versioning.  
+- **save_reports** *(id, save_id, reporter_id, reason, created_at)* — thin link to moderation cases.
+
+- **ach_sets** *(id, variant_id, type, curator_id?, title, description_md, rating_agg, created_at, read_only?)*  
+  - **type** ∈ `official|retro|fan`; official/retro are **read-only** (`read_only=true`).  
+- **ach_items** *(id, set_id, key, title, criteria_md, flags jsonb, order_index)*  
+  - Flags: `storyline|irreversible|final|spoiler_level`.  
+- **ach_progress** *(user_id, item_id, state, unlocked_at?, evidence_id?)* with **state** ∈ `locked|in_progress|unlocked`.  
+- **ach_evidence_links** *(id, owner_id, url, provider, title?, thumb_url?, approved?)* — allowlisted providers only.
+
+- **album_templates** *(id, variant_id, type, curator_id, title, description_md, slots_count, spoiler_policy, created_at)*  
+  - **type** ∈ `new_player|full_discovery|themed`.  
+- **album_slots** *(id, template_id, slot_key, short_hint, non_spoiler_hints[], order_index, ai_hints jsonb?)*  
+- **album_instances** *(id, template_id, owner_id, created_at, completion_pct)*  
+- **slot_fills** *(id, instance_id, slot_id, object_key, taken_at?, approved?, moderation_state, created_at)*
+
+- **moderation_cases** *(id, target_type, target_id, queue, status, created_at, closed_at?)*  
+- **mod_actions** *(id, case_id, actor_id, action, reason, created_at, delta_jsonb)* — immutable ledger.  
+- **reports** *(id, target_type, target_id, reporter_id, reason_code, note, created_at)*
+
+- **events** *(id, user_id?, type, target_type, target_id, payload jsonb, occurred_at)* — append-only telemetry for aggregates.
+
+> **DS-REL-01:** All tables with user-generated content must have `created_at`, `updated_at`, and **soft-delete** via `*_deleted_at` or status field for reversible actions.
+
+---
+<br>
+
+### 7.3 Version-Compatibility Layer (Modern & Retro)
+
+- **save_compat_tests** *(id, save_id, build_manifest_id?, region?, emulator_id?, result, tested_by, evidence_link_id?, tested_at)*  
+  - **result** ∈ `works|works_with_warnings|fails`.  
+  - Stores **steam build/manifest** where known; for retro: **region (PAL/NTSC)** and **emulator core**.
+
+- **variant_builds** *(variant_id, build_id, source, first_seen_at, last_seen_at?)*  
+  - **source** ∈ `auto_steam|manual_admin|community`.  
+  - Used to **flip** saves to `legacy` when new builds appear (policy from §4.3).
+
+- **compat_overrides** *(target_type, target_id, new_status, reason_md, actor_id, created_at)*  
+  - Moderator/Admin override log (ties to §4.7).
+
+> **DS-COMP-01:** A save’s **public status** is the **most conservative** of: latest successful compat test vs the current variant build, any moderator override, and user-reported failures that reached the threshold (per §4.7).  
+> **DS-COMP-02:** When a new `variant_builds` record is added, all **confirmed** saves transition to **`untested`** until retested; nightly job attempts community revalidation.
+
+---
+<br>
+
+### 7.4 Object Storage Layout (Saves, Screenshots, Quarantine)
+
+- **Buckets/Prefixes (example):**
+*dp-prod-s3/
+saves/
+{save_id}/orig/{filename}
+{save_id}/meta/sidecar.json
+{save_id}/archive/{vnum}/{filename}
+screenshots/
+{slot_fill_id}/orig.{ext}
+{slot_fill_id}/thumb.{ext}
+quarantine/
+{uuid}/{original_filename}*
+- **Checksums & dedup:**  
+- Compute **sha256** server-side; deduplicate identical payloads by linking multiple save rows to one object key if identical (space saver).  
+- **EXIF/PII:** Strip metadata on image ingest; write-protect originals; thumbnails re-derived on demand.  
+- **Lifecycle:**  
+- Thumbnails cached; **inactivity archive** for saves after **12 months** (see §6.9).  
+- Quarantined objects auto-deleted after **N days** unless under legal hold.  
+- **Signed URLs:** Generated for private/link-only fetches; short TTLs.
+
+> **DS-OBJ-01:** Every stored object must be referenced by a **DB record**; orphan sweeper runs daily.  
+> **DS-OBJ-02:** Quarantine assets **never** served to end users; only safe previews in moderator UI.
+
+---
+<br>
+
+### 7.5 Search Index & Denormalisation
+
+- **Indexes per vertical:** `games`, `saves`, `ach_sets`, `albums`, `users`, plus a lightweight `suggest` index.  
+- **Projected fields:**  
+- Games: `title`, `alt_titles`, `platforms`, `has_saves|sets|albums`, `ua_flags`, `ru_linked`.  
+- Saves: `game`, `variant`, **build closeness**, **status**, DLC flags, uploader nickname (if public), popularity.  
+- Ach sets: `type (official|retro|fan)`, rating, flags, curator.  
+- Albums: `type`, slot count, completion rate.  
+- **Freshness SLOs:** visibility/moderation changes ≤ **3 min**; new/updated content ≤ **5 min** (§6.1).  
+- **Privacy guard:** only **public projections** are indexed; private/link-only items excluded.
+
+> **DS-IDX-01:** Visibility change events create **suppression tokens** used at query time until the index catches up (dual-layer safety).  
+> **DS-IDX-02:** Store **transliteration keys** and **synonym maps** to support UA/EN discovery.
+
+---
+<br>
+
+### 7.6 Caching & Sessions
+- **Redis** for: session store, rate-limits, CSRF tokens, idempotency keys, ephemeral search results, and “manual sync cooldowns”.  
+- **TTL discipline:** short TTLs (≤ 5 min) on discovery caches; token TTLs aligned with security policy.
+
+> **DS-CACHE-01:** No PII in cache values; keys are opaque with namespace prefixes (e.g., `sess:`, `ratel:`, `srch:`).
+
+---
+<br>
+
+### 7.7 Data Lifecycle & Retention
+
+- **Saves:**  
+- **Archive** after 12 months of no downloads or updates (email notice + in-app banner).  
+- **Purge** on owner deletion request unless under moderation/legal hold.  
+- **Screenshots:** stored indefinitely unless the album instance is deleted or content is removed via moderation.  
+- **Moderation:** reports & evidence retained **12 months** post-closure; longer if legal hold.  
+- **External links:** metadata (titles/thumbnails) carried with **TTL**; refreshed on access.
+
+> **DS-LIFE-01:** Lifecycle jobs are **idempotent** and produce audit entries (`events` table).  
+> **DS-LIFE-02:** On **unlink** (Steam/RA), user-specific progress is purged within **30 days**; aggregates stay anonymised.
+
+---
+<br>
+
+### 7.8 Consistency & Transactions
+
+- **Write paths:** use DB transactions for multi-table changes (e.g., creating a save + initial compat record).  
+- **Eventual consistency:** aggregates (ratings, completion %) recomputed asynchronously with **≤ 10 min** convergence target (§6.10).  
+- **Idempotency:** uploads, webhooks, and external sync rely on **idempotency keys** to avoid duplicates.
+
+> **DS-CONS-01:** Any operation that affects **visibility** (moderation, privacy change) must be **transactional** and emit a **visibility-change event** to drive index suppression.
+
+---
+<br>
+
+### 7.9 Backups & Disaster Recovery
+
+- **DB backups:** daily snapshots; **RPO ≤ 24h**, **RTO ≤ 24h** (MVP); quarterly restore drills (§6.9).  
+- **Object store:** provider durability + inventory checks; periodic **checksum audits**.  
+- **Runbooks:** documented restore procedures for DB and object prefixes.
+
+> **DS-DR-01:** Backups must **exclude** secrets; restore jobs run in **isolated** environment before promotion.
+
+---
+<br>
+
+### 7.10 Security & Privacy at Rest
+
+- **Encryption:** DB volumes & S3 objects encrypted (KMS); per-tenant keys optional later.  
+- **Secrets:** Vault-managed; rotation ≤ 90 days (§6.3).  
+- **Access control:** strict RBAC on admin/mod tools; immutable audit logs for actions.  
+- **PII minimisation:** store only required fields; external IDs hidden unless owner enables panel.
+
+> **DS-SEC-01:** Save files are treated as **untrusted binaries**; must pass AV scan before any processing (thumbnails, etc.).  
+> **DS-SEC-02:** Remove **EXIF & GPS** from all user images upon ingest.
+
+---
+<br>
+
+### 7.11 Data Residency & Localisation
+
+- **Residency:** Default region **EU** for DB and object store; CDN edges for global delivery; exceptions documented if a provider lacks EU regions.  
+- **Localisation data:** UA/Russia policy flags live on **games/variants**, surfaced only in Catalogue/Discovery (never on profiles).
+
+> **DS-LOC-01:** Locale affects **index ranking** and **UI strings**, not underlying stored values (store canonical).
+
+---
+<br>
+
+### 7.12 Data Quality & Governance
+
+- **Referential integrity:** FK constraints on all child tables (`variants → games`, `saves → variants`, etc.).  
+- **Uniqueness:** `(game_id, platform, region)` unique for variants; `(set_id, key)` unique for ach_items; `(user_id, item_id)` unique for ach_progress.  
+- **Validation hooks:** server-side validation for **allowlisted** evidence links; **file-type** sniffing on uploads.  
+- **Provenance:** manual/curator/admin overrides require a **reason** and are logged (mods ledger).  
+- **Deduplication:** identical `sha256` saves can share physical object; logical rows remain distinct for metadata.
+
+> **DS-GOV-01:** Any schema change must include **migrations**, **backfill scripts**, and an **index impact note** for §4.8.  
+> **DS-GOV-02:** Data dictionary (fields, enums, constraints) kept in repo and exported to the ERD in **Visuals**.
+
+---
+<br>
+
+### 7.13 Volume & Growth Assumptions (for sizing)
+
+- **Users:** 5–10k in year 1 (MVP target ~500–1k active).  
+- **Saves:** 50–200k objects (avg 5–20 MB); long-tail heavy.  
+- **Screenshots:** 1–5M images (avg 300–800 KB after derivatives).  
+- **Index:** 1M+ game/variant docs via IGDB; saves/albums/sets scale with community.
+
+> **DS-CAP-01:** Partition large tables by **time** (monthly) for `saves`, `slot_fills`, `events`; archive partitions older than 18 months.
+
+---
+<br>
+<br>
+
+## 8. Operational & Deployment Considerations
+
+> How we run Dream Project in production: environments, CI/CD, infra-as-code, secrets, observability, incident response, moderation ops, cost control, and change management.  
+> **ID scheme:** `OP-<AREA>-NN` (e.g., `OP-CI-01`). Each item follows **Intent · Practices · Verification & Owner**.
+
+---
+<br>
+
+### 8.0 Scope & Principles
+
+**OP-PR-01 — Operate by SLOs**  
+- **Intent:** Align day-to-day ops to the NFR SLOs (§6).  
+- **Practices:** Publish dashboards for latency/availability/index-lag/moderation SLA; quarterly SLO review.  
+- **Verification & Owner:** SLO review notes and dashboards — **Tech Lead (TL)**, **BA/PO**.
+
+**OP-PR-02 — Everything as Code**  
+- **Intent:** Make infra/config reproducible and auditable.  
+- **Practices:** IaC for infra; GitOps for config/policies; DB schema migrations in repo; PR reviews mandatory.  
+- **Verification & Owner:** Change diffs in PRs; Terraform plan approvals — **DevOps/Infra**, **TL**.
+
+#### 8.0.a Owner Map (MVP)
+- **BA/PO:** requirements, docs, policy, data steward duties.  
+- **Tech Lead (TL):** architecture, security champion, releases, incident command.  
+- **Backend Lead (BE Lead):** APIs, DB, search, integrations, migrations.  
+- **Frontend Lead (FE Lead):** web UI, accessibility, performance budgets.  
+- **DevOps/Infra (part-time):** CI/CD, IaC, cloud, monitoring, backups.  
+- **QA Lead:** test strategy, automation, release validation.  
+- **Community/Moderation Lead:** queues, SLAs, appeals, content policy.  
+- **Platform Admin (ops persona):** console tasks, user support.  
+> Roles can be combined in a lean team (e.g., TL = Security Champion).
+
+---
+<br>
+
+### 8.1 Environments & Config
+- **Intent:** Isolate risk; keep configuration consistent and reviewable.  
+- **Practices:** Separate **dev/staging/prod**; no prod data downstream; central config store (read-only at runtime), **secrets in vault**; feature flags for risky paths.  
+- **Verification & Owner:** Env isolation smoke tests; config drift checks — **DevOps/Infra**, **TL**.
+
+---
+<br>
+
+### 8.2 CI/CD & Release Strategy
+- **Intent:** Ship frequently, safely, and reversibly.  
+- **Practices:** CI: lint, SAST, unit/integration tests, container build, SBOM; **blue/green or canary** (10%→50%→100%); auto DB migrations with preflight and rollback plan.  
+- **Verification & Owner:** Green CI gates; canary dashboards; rollback drill logs — **DevOps/Infra**, **TL**, **QA Lead**.
+
+---
+<br>
+
+### 8.3 Infrastructure & IaC
+- **Intent:** Codify infra and enforce defense-in-depth.  
+- **Practices:** VPC with private subnets for app/DB; least-privilege security groups; **WAF + CDN** at the edge; **multi-AZ** app and DB replicas (MVP).  
+- **Verification & Owner:** Terraform plan reviews; AZ fault drill outcomes — **DevOps/Infra**, **TL**.
+
+---
+<br>
+
+### 8.4 Secrets & Keys
+- **Intent:** Protect credentials and reduce exposure windows.  
+- **Practices:** Vault-managed secrets; rotation ≤ **90 days**; short-lived env injection; never log secrets; provider tokens encrypted at rest.  
+- **Verification & Owner:** Rotation report; CI secret scans — **DevOps/Infra**, **TL**.
+
+---
+<br>
+
+### 8.5 Observability
+- **Intent:** Detect issues fast and trace them end-to-end.  
+- **Practices:** Structured logs with **correlation IDs**; metrics for latency/error/index-lag/queue-lag/quota use; distributed tracing **≥10%** sampling; dashboards per SLO.  
+- **Verification & Owner:** Dashboards live and alert tests pass — **DevOps/Infra**, **BE Lead**.
+
+---
+<br>
+
+### 8.6 Backup, DR & Resilience
+- **Intent:** Recover from data loss and ride through provider outages.  
+- **Practices:** Daily DB backups (**RPO ≤ 24h**, **RTO ≤ 24h**); object checksum audits; graceful degradation on Steam/RA/IGDB failures (stale markers); feature flags to disable sick adapters.  
+- **Verification & Owner:** Quarterly restore drills; chaos tests results — **DevOps/Infra**, **BE Lead**, **TL**.
+
+---
+<br>
+
+### 8.7 Incident Response
+- **Intent:** Minimise MTTR with clear roles and scripts.  
+- **Practices:** Sev ladder (Sev1 data/security, Sev2 SLO breach, Sev3 partial degradation); on-call rotation; runbooks for rollback, stuck queues, reindex, adapter disable, WAF lock-down; blameless postmortems ≤ 5 biz days.  
+- **Verification & Owner:** Postmortem docs; runbook links in alerts — **TL (Incident Cmdr)**, **DevOps/Infra**, **QA Lead**.
+
+---
+<br>
+
+### 8.8 Data Operations
+- **Intent:** Keep data consistent, lawful, and exportable.  
+- **Practices:** Zero-downtime reindex (dual-write/snapshot); GDPR-style export/delete within **30 days**; quarterly PII minimisation review.  
+- **Verification & Owner:** Ticket SLA logs; reindex metrics — **BA/PO**, **BE Lead**.
+
+---
+<br>
+
+### 8.9 Moderation Operations
+- **Intent:** Safe community with predictable SLAs.  
+- **Practices:** AI triage → human queue; **initial review ≤ 48h** (MVP); immutable moderation ledger; 7-day appeals flow; quarantine never publicly served.  
+- **Verification & Owner:** Queue dashboards; sample audits — **Community/Moderation Lead**, **Platform Admin**.
+
+---
+<br>
+
+### 8.10 Cost Management
+- **Intent:** Avoid surprise bills and scale economically.  
+- **Practices:** Cost tags per env/component (api, workers, index, storage, cdn); monthly budget alarms; storage lifecycle (archive inactive saves after **12 months**).  
+- **Verification & Owner:** Monthly cost report — **DevOps/Infra**, **BA/PO**.
+
+---
+<br>
+
+### 8.11 Security Operations
+- **Intent:** Shrink vulnerability windows and access risk.  
+- **Practices:** Patch cadence monthly; critical CVEs ≤ **7 days**; SAST/DAST in CI; annual pen-test; quarterly RBAC review; break-glass accounts with hardware keys.  
+- **Verification & Owner:** SBOM gates; access audit logs — **TL (Security Champion)**, **DevOps/Infra**.
+
+---
+<br>
+
+### 8.12 Release & Feature Toggling
+- **Intent:** Launch incrementally and fail safe.  
+- **Practices:** Canary with **auto-abort** on p95/error thresholds; kill switches for AI moderation, evidence allowlist, and adapter syncs.  
+- **Verification & Owner:** Flag audit; release dashboard — **TL**, **DevOps/Infra**, **QA Lead**.
+
+---
+<br>
+
+### 8.13 Maintenance Windows & Status Page
+- **Intent:** Keep users informed during planned work.  
+- **Practices:** 48h notice in-app; optional read-only mode; public status page (API, uploads, images, search, adapters) with incident history.  
+- **Verification & Owner:** Status updates recorded — **Platform Admin**, **DevOps/Infra**.
+
+---
+<br>
+
+### 8.14 Access Management (Internal)
+- **Intent:** Enforce least privilege with full auditability.  
+- **Practices:** Separate **operator** vs **moderator** roles; no direct DB for routine tasks; quarterly RBAC review; break-glass procedure documented.  
+- **Verification & Owner:** RBAC review notes; audit trail sampling — **TL**, **Platform Admin**.
+
+---
+<br>
+
+### 8.15 Runbooks & Knowledge Base
+- **Intent:** Make fixes repeatable under stress.  
+- **Practices:** One runbook per critical path (deploy, rollback, reindex, adapter outage, AV spike); quarterly fire-drills; onboarding checklists for on-call/moderators/curators.  
+- **Verification & Owner:** Drill notes in repo; checklist completion — **TL**, **Community/Moderation Lead**.
+
+---
+<br>
+
+### 8.16 Capacity Planning & Load Testing
+- **Intent:** Stay ahead of demand and avoid cliff edges.  
+- **Practices:** Quarterly load tests to §6 targets (API **100 RPS** baseline with 2× headroom; 5 parallel uploads/user; search p95 ≤ **700 ms**); shard/replica plan and re-shard playbook for search.  
+- **Verification & Owner:** Load test report approved — **BE Lead**, **DevOps/Infra**.
+
+---
+<br>
+
+### 8.17 Third-Party Integrations Ops
+- **Intent:** Respect quotas/ToS and degrade gracefully.  
+- **Practices:** Quota dashboards (Steam/RA/IGDB) with alarms at **70/90%**; auto-stagger jobs; policy watch with auto-disable on ToS change; manual/admin overrides documented.  
+- **Verification & Owner:** Adapter health board; policy checklist — **BE Lead (Integrations)**, **TL**.
+
+---
+<br>
+
+### 8.18 Change Management
+- **Intent:** Make every change reviewable and reversible.  
+- **Practices:** PR-based changes with mandatory reviewer; post-release smoke + synthetic checks; prefer roll-forward when safe, with clear rollback path.  
+- **Verification & Owner:** Release notes + PR links — **TL**, **QA Lead**, **BA/PO**.
+
+---
+<br>
+<br>
+
+## 9. Traceability & Mapping to BRD
+
+> This section shows how the **SRS** fulfils the **Business Requirements** from the **BRD**, and where applicable which **Non-Functional Requirements (NFRs)** influence each area.  
+> Row-level (requirement-to-requirement) links live in the **Requirements Traceability Matrix (RTM)** in the Documents package. This section is the **module-level map** and the rules for keeping traceability healthy.
+
+---
+<br>
+
+### 9.1 Purpose & Policy
+
+- **Forward traceability:** Every SRS requirement `SR-*` must point to one or more BRD business requirements `BR-*`.  
+- **Backward traceability:** Every BRD requirement must be implemented or explicitly deferred in the SRS.  
+- **NFR hooks:** When an SRS requirement is materially constrained by NFRs, reference the relevant `NFR-*`.  
+- **Change control:** Any change in BRD or SRS must update the RTM within the same PR.
+
+> **ID conventions recap:**  
+> **BRD**: `BR-<AREA>-NN` (e.g., `BR-ACC-03`).  
+> **SRS**: `SR-<MODULE>-NN` (e.g., `SR-ACC-12`).  
+> **NFR**: `NFR-<DOMAIN>-NN` (e.g., `NFR-SEC-04`).
+
+---
+<br>
+
+### 9.2 Module-Level Mapping to BRD & NFRs
+
+| SRS Module (Section) | SRS ID Prefix | Primary BRD Coverage | Key NFR Influence |
+|---|---|---|---|
+| **4.1 Accounts & Authentication** | `SR-ACC-*` | `BR-ACC-01..` (registration, login, password reset, 2FA, locale, unlink external) | `NFR-SEC-01..05` (transport, encryption, secrets, RBAC), `NFR-UX-01/03`, `NFR-LOC-01/02` |
+| **4.2 Game Catalogue & Localisation Flags** | `SR-CAT-*` | `BR-CAT-01..` (game/variant records, UA flags, RU-linked metadata, pillar availability) | `NFR-DQ-01` (catalogue integrity), `NFR-LOC-03` (policy exposure), `NFR-PERF-03` (search freshness) |
+| **4.3 Save Management** | `SR-SAV-*` | `BR-SAV-01..` (upload/download, metadata, versioning, compatibility layer, moderation/report) | `NFR-SEC-04` (AV scan), `NFR-PERF-04` (throughput), `NFR-DQ-02` (compat accuracy), `NFR-RET-01` |
+| **4.4 Achievement Tracking** | `SR-ACH-*` | `BR-ACH-01..` (official via Steam, retro via RA, fan sets, evidence, comments/ratings) | `NFR-INT-01/02` (timeouts/stubs), `NFR-UX-02` (spoilers), `NFR-SEC-07` (PII minimisation) |
+| **4.5 Sticker Albums** | `SR-ALB-*` | `BR-ALB-01..` (templates, spoiler policies, AI validation triage, completion stats) | `NFR-UX-02` (spoiler safety), `NFR-PERF-04` (uploads), `NFR-SEC-04` (file hygiene) |
+| **4.6 Profiles & Progress** | `SR-PRO-*` | `BR-PRO-01..` (profile panels, privacy, aggregates, roles history, curator badges) | `NFR-SEC-07` (privacy/RTBF), `NFR-DQ-03` (aggregate convergence), `NFR-LOC-01/02` |
+| **4.7 Moderation & Reporting** | `SR-GOV-*` | `BR-GOV-01..` (reporting, queues, quarantine, appeals, admin overrides) | `NFR-SEC-05` (audit), `NFR-LAW-01` (takedowns), `NFR-AVL-02` (graceful degradation) |
+| **4.8 Discovery & Search** | `SR-DSC-*` | `BR-DSC-01..` (search, filters, UA/RU toggles, typeahead, result badges) | `NFR-PERF-01/03` (latency, freshness), `NFR-LOC-02/03`, `NFR-DQ-01/02` |
+| **4.9 External Integrations & Adapters** | `SR-INT-*` | `BR-INT-01..` (IGDB, Steam, RA, evidence allowlist, storage/CDN, email, vision triage) | `NFR-INT-01/02`, `NFR-SEC-01..03`, `NFR-AVL-04`, `NFR-OBS-02` |
+| **5. External Interface Requirements** | (per interface) | Cross-cuts multiple BR areas (public API & UI constraints for ACC/CAT/SAV/ACH/ALB/DSC) | `NFR-SEC-*`, `NFR-UX-*`, `NFR-PERF-*` |
+
+> **Note:** The **version-compatibility layer** (build/manifest IDs for Steam; region/emulator facets for retro; statuses `confirmed/untested/legacy/incompatible`) threads through **BR-SAV**, **BR-CAT**, **BR-DSC**, and **BR-GOV** and is implemented across `SR-SAV-*`, `SR-CAT-*`, `SR-DSC-*`, `SR-GOV-*`.
+
+---
+<br>
+
+### 9.3 Example Row-Level Mappings (excerpt)
+
+> Full RTM has one row per requirement. This excerpt shows the pattern only.
+
+| BRD Requirement | SRS Requirement(s) | Related NFR(s) | Notes |
+|---|---|---|---|
+| `BR-ACC-03` (Email+Password Login) | `SR-ACC-05` (login), `SR-ACC-06` (lockout), `SR-ACC-07` (CSRF/session) | `NFR-SEC-01/04` | Lockout & CSRF explicitly covered. |
+| `BR-SAV-04` (Save Upload w/ Scan) | `SR-SAV-11` (upload), `SR-SAV-24` (AV scan), `SR-SAV-22` (quarantine) | `NFR-SEC-04`, `NFR-PERF-04` | Quarantine never publicly served. |
+| `BR-ACH-08` (Fan Sets Evidence) | `SR-ACH-18` (evidence links), `SR-ACH-19` (allowlist) | `NFR-SEC-07`, `NFR-INT-01` | No video upload; links only. |
+| `BR-INT-02` (Steam Linking) | `SR-INT-05` (OAuth link), `SR-INT-06` (sync) | `NFR-SEC-03`, `NFR-AVL-02` | Read-only; stale banners on outage. |
+| `BR-DSC-03` (UA/RU Toggle) | `SR-DSC-14` (policy filters), `SR-CAT-12` (flags) | `NFR-LOC-03`, `NFR-DQ-01` | Flags only in catalogue/discovery. |
+
+---
+<br>
+
+### 9.4 Coverage & Gaps
+
+- **Coverage rule:** RTM must show **100%** of `BR-*` covered by one or more `SR-*`, or explicitly tagged **Deferred** with a target release.  
+- **Gap handling:** If a BRD item has no SRS link, flag as **GAP**; if an SRS item has no BRD link, flag as **ORPHAN** (possible scope creep).  
+- **NFR links:** Where an NFR materially constrains behaviour (e.g., file size caps, latency), include it in the RTM row.
+
+---
+<br>
+
+### 9.5 Change Workflow
+
+1. Update BRD or SRS content.  
+2. Update **RTM** rows in the same PR (add/modify links).  
+3. CI check verifies: no **GAP** or **ORPHAN** rows; all IDs parse; anchors resolve.  
+4. Product/BA reviews impact; Tech Lead reviews technical feasibility.
+
+---
+<br>
+
+### 9.6 RTM Location & Format
+
+- **Location (Documents):** `/documents/rtm.md`.  
+- **Format:** Markdown table with columns: `BR-ID`, `BR Title`, `SRS IDs`, `NFR IDs`, `Status {Implemented|Deferred}`, `Notes`.  
+- **Export:** Optional CSV export for testing tools.
+
+---
+<br>
+
+### 9.7 Known Deferrals (MVP)
+
+> If any BRD items are out of MVP scope, list them here to keep the RTM terse.
+
+- *Example placeholder:* `BR-INT-09` (additional modern platforms beyond Steam) → **Deferred** to Phase II; not mapped in SRS MVP.
+
+---
+<br>
+
+**Summary:** With this mapping policy, we preserve **bidirectional traceability**: every BRD goal is implemented or explicitly deferred, every SRS behaviour is justified, and key NFRs are attached where they shape the design. The full RTM provides the granular evidence; this section stays as your high-level map.
+
+
+
